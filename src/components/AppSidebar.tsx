@@ -12,6 +12,10 @@ import {
   LayoutDashboard,
   Wrench,
   Save,
+  Info,
+  FileText as FileTextIcon,
+  Sparkles,
+  Scale,
 } from "lucide-react";
 import {
   Sidebar,
@@ -42,6 +46,13 @@ const outputItems = [
   { title: "Recommendation Report", url: "/report", icon: FileText },
   { title: "Saved Selections", url: "/saved", icon: Save },
   { title: "Reference Library", url: "/references", icon: BookOpen },
+];
+
+const helpItems = [
+  { title: "User Manual", url: "/manual", icon: FileTextIcon },
+  { title: "EULA", url: "/eula", icon: Scale },
+  { title: "About", url: "/about", icon: Info },
+  { title: "Release Notes", url: "/release", icon: Sparkles },
 ];
 
 export function AppSidebar() {
@@ -101,6 +112,24 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {outputItems.map((item) => (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                    <Link to={item.url}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Help &amp; Info</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {helpItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
                     <Link to={item.url}>
