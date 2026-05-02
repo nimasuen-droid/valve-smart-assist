@@ -23,7 +23,14 @@ export const Route = createFileRoute("/wizard/project")({
 });
 
 function ProjectStep() {
-  const { input, update } = useSelection();
+  const { input, update, reset } = useSelection();
+
+  const clearAll = () => {
+    if (!hasUserData && !input.isSample) return;
+    if (!window.confirm("Clear all project and service condition inputs?")) return;
+    reset();
+    toast.success("All fields cleared.");
+  };
 
   const hasUserData = !!(
     input.projectName || input.tagNumber || input.lineNumber || input.clientName ||
