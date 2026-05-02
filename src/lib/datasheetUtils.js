@@ -212,28 +212,66 @@ export function generatePdfHtml(data) {
   <title>Valve Datasheet – ${tag}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 9pt; color: #111; padding: 10mm; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 4pt; }
-    td { vertical-align: middle; }
+    html, body { background: #f8fafc; }
+    body {
+      font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 9pt; color: #0f172a; padding: 14mm;
+      -webkit-font-smoothing: antialiased;
+    }
+    .sheet {
+      max-width: 1180px; margin: 0 auto; background: #fff;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.08), 0 8px 24px rgba(15,23,42,0.06);
+      padding: 14mm;
+    }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 6pt; }
+    td { vertical-align: middle; line-height: 1.35; }
+    .brand-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 14px; background:#0f172a; color:#fff;
+      border-radius: 4px 4px 0 0; margin-bottom: 0;
+    }
+    .brand-bar .logo {
+      width: 34px; height: 34px; border-radius: 6px;
+      background: linear-gradient(135deg,#3b82f6,#60a5fa);
+      display:inline-flex; align-items:center; justify-content:center;
+      font-weight:700; color:#0f172a; margin-right:10px;
+    }
+    .brand-left { display:flex; align-items:center; }
+    .brand-name { font-weight:600; font-size:11pt; letter-spacing:0.04em; }
+    .brand-sub { font-size:8pt; color:#94a3b8; margin-top:2px; letter-spacing:0.08em; text-transform:uppercase; }
+    .doc-title { text-align:right; }
+    .doc-title h1 { font-size:13pt; font-weight:600; letter-spacing:0.04em; }
+    .doc-title .meta { font-size:8.5pt; color:#cbd5e1; margin-top:2px; }
     @media print {
-      body { padding: 6mm; }
+      body { padding: 0; background:#fff; }
+      .sheet { box-shadow:none; padding: 8mm; max-width:none; }
       @page { size: A3 landscape; margin: 10mm; }
     }
   </style>
 </head>
 <body>
+<div class="sheet">
+
+<!-- ══ BRAND BAR ══ -->
+<div class="brand-bar">
+  <div class="brand-left">
+    <span class="logo">V</span>
+    <div>
+      <div class="brand-name">VALVE SELECTION GUIDE</div>
+      <div class="brand-sub">Engineering Datasheet · API 615</div>
+    </div>
+  </div>
+  <div class="doc-title">
+    <h1>DATA SHEET — ${vType.toUpperCase()}</h1>
+    <div class="meta">Doc No. ${dsNumber} &nbsp;·&nbsp; Rev 0 &nbsp;·&nbsp; ${today} &nbsp;·&nbsp; ${status}</div>
+  </div>
+</div>
+
 <table>
 <tbody>
 
-<!-- ══ HEADER ══ -->
-<tr>
-  <td colspan="2" rowspan="2" style="${HDR}font-size:13pt;">CONTRACTOR LOGO &amp; NAME</td>
-  <td style="${GAP}" rowspan="2"></td>
-  <td colspan="2" style="${HDR}font-size:11pt;text-align:center;">DATA SHEET FOR ${vType.toUpperCase()}</td>
-</tr>
-<tr>
-  <td colspan="2" style="${SUB}">Per API 615 Recommended Practice</td>
-</tr>
+<!-- ── Identity rows ── -->
+<tr><td colspan="5" style="height:8px;border:none;"></td></tr>
 
 <!-- ── Identity rows ── -->
 <tr>
