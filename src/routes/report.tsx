@@ -7,6 +7,7 @@ import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards"
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { saveSelection } from "@/lib/selectionState";
 import { toast } from "sonner";
+// @ts-ignore - datasheetUtils is a JS module
 import { generatePdfHtml } from "@/lib/datasheetUtils";
 
 export const Route = createFileRoute("/report")({
