@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eraser, RotateCcw, BookOpen, Save } from "lucide-react";
+import { Eraser, RotateCcw, BookOpen, Save, Info, Sparkles, FileText, Scale } from "lucide-react";
 import { useSelection } from "@/lib/SelectionContext";
 import { toast } from "sonner";
 
@@ -9,6 +9,8 @@ export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Valve Selection Guide" }] }),
   component: SettingsPage,
 });
+
+const APP_VERSION = "0.4.0";
 
 function SettingsPage() {
   const { reset } = useSelection();
@@ -55,10 +57,36 @@ function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">About</CardTitle>
-          <CardDescription>Valve Selection Guide · v0.1 — decision-support tool. Verify with PE.</CardDescription>
+          <CardTitle className="text-base">Help &amp; information</CardTitle>
+          <CardDescription>Manual, release notes, and legal.</CardDescription>
         </CardHeader>
+        <CardContent className="space-y-3">
+          <Button asChild variant="outline" className="h-12 w-full justify-start text-base">
+            <Link to="/manual">
+              <FileText className="h-4 w-4" /> User manual
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-12 w-full justify-start text-base">
+            <Link to="/about">
+              <Info className="h-4 w-4" /> About
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-12 w-full justify-start text-base">
+            <Link to="/release">
+              <Sparkles className="h-4 w-4" /> Release notes
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-12 w-full justify-start text-base">
+            <Link to="/eula">
+              <Scale className="h-4 w-4" /> End User License Agreement
+            </Link>
+          </Button>
+        </CardContent>
       </Card>
+
+      <p className="text-center text-xs text-muted-foreground">
+        Valve Selection Guide · v{APP_VERSION}
+      </p>
     </div>
   );
 }
