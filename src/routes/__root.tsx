@@ -86,11 +86,11 @@ function RootComponent() {
             </div>
           </header>
           <main className="flex-1 space-y-4 p-4 pb-24 md:space-y-6 md:p-8 md:pb-8">
+            <Outlet />
             <WarningBanner title="Decision-support tool only">
               All outputs are screening aids. Verify against project specs, latest standards, and a
               qualified piping engineer before issuing for procurement or fabrication.
             </WarningBanner>
-            <Outlet />
           </main>
         </div>
         <MobileBottomNav />
