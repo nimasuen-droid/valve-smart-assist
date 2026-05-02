@@ -40,8 +40,8 @@ function EulaPage() {
             qualified engineering judgement.
           </p>
           <p>
-            Final design shall be reviewed and approved by a qualified piping engineer against the
-            governing project codes, standards, client specifications, and latest approved revisions.
+            All outputs are screening aids. Verify against project specs, latest standards, and a
+            qualified piping engineer before issuing for procurement or fabrication.
           </p>
         </CardContent>
       </Card>
