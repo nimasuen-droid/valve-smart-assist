@@ -24,6 +24,15 @@ export interface SelectionInput {
   notes?: string;
   isSample?: boolean;
   sampleTitle?: string;
+  // Sizing inputs (IEC 60534) — optional, used for throttling validation
+  sizingPhase?: "liquid" | "gas";
+  sizingFlow?: string;
+  sizingInletP?: string;
+  sizingDp?: string;
+  sizingTemp?: string;
+  sizingSG?: string;
+  sizingPv?: string;
+  sizingK?: string;
 }
 
 const DEFAULT: SelectionInput = {

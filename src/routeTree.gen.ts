@@ -15,6 +15,7 @@ import { Route as ReferencesRouteImport } from './routes/references'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WizardTypeRouteImport } from './routes/wizard.type'
 import { Route as WizardSpecialRouteImport } from './routes/wizard.special'
+import { Route as WizardSizingRouteImport } from './routes/wizard.sizing'
 import { Route as WizardProjectRouteImport } from './routes/wizard.project'
 import { Route as WizardMaterialsRouteImport } from './routes/wizard.materials'
 import { Route as WizardFunctionRouteImport } from './routes/wizard.function'
@@ -49,6 +50,11 @@ const WizardTypeRoute = WizardTypeRouteImport.update({
 const WizardSpecialRoute = WizardSpecialRouteImport.update({
   id: '/wizard/special',
   path: '/wizard/special',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WizardSizingRoute = WizardSizingRouteImport.update({
+  id: '/wizard/sizing',
+  path: '/wizard/sizing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WizardProjectRoute = WizardProjectRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/wizard/function': typeof WizardFunctionRoute
   '/wizard/materials': typeof WizardMaterialsRoute
   '/wizard/project': typeof WizardProjectRoute
+  '/wizard/sizing': typeof WizardSizingRoute
   '/wizard/special': typeof WizardSpecialRoute
   '/wizard/type': typeof WizardTypeRoute
 }
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/wizard/function': typeof WizardFunctionRoute
   '/wizard/materials': typeof WizardMaterialsRoute
   '/wizard/project': typeof WizardProjectRoute
+  '/wizard/sizing': typeof WizardSizingRoute
   '/wizard/special': typeof WizardSpecialRoute
   '/wizard/type': typeof WizardTypeRoute
 }
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/wizard/function': typeof WizardFunctionRoute
   '/wizard/materials': typeof WizardMaterialsRoute
   '/wizard/project': typeof WizardProjectRoute
+  '/wizard/sizing': typeof WizardSizingRoute
   '/wizard/special': typeof WizardSpecialRoute
   '/wizard/type': typeof WizardTypeRoute
 }
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/wizard/function'
     | '/wizard/materials'
     | '/wizard/project'
+    | '/wizard/sizing'
     | '/wizard/special'
     | '/wizard/type'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/wizard/function'
     | '/wizard/materials'
     | '/wizard/project'
+    | '/wizard/sizing'
     | '/wizard/special'
     | '/wizard/type'
   id:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/wizard/function'
     | '/wizard/materials'
     | '/wizard/project'
+    | '/wizard/sizing'
     | '/wizard/special'
     | '/wizard/type'
   fileRoutesById: FileRoutesById
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   WizardFunctionRoute: typeof WizardFunctionRoute
   WizardMaterialsRoute: typeof WizardMaterialsRoute
   WizardProjectRoute: typeof WizardProjectRoute
+  WizardSizingRoute: typeof WizardSizingRoute
   WizardSpecialRoute: typeof WizardSpecialRoute
   WizardTypeRoute: typeof WizardTypeRoute
 }
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/wizard/special'
       fullPath: '/wizard/special'
       preLoaderRoute: typeof WizardSpecialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wizard/sizing': {
+      id: '/wizard/sizing'
+      path: '/wizard/sizing'
+      fullPath: '/wizard/sizing'
+      preLoaderRoute: typeof WizardSizingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/wizard/project': {
@@ -265,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   WizardFunctionRoute: WizardFunctionRoute,
   WizardMaterialsRoute: WizardMaterialsRoute,
   WizardProjectRoute: WizardProjectRoute,
+  WizardSizingRoute: WizardSizingRoute,
   WizardSpecialRoute: WizardSpecialRoute,
   WizardTypeRoute: WizardTypeRoute,
 }
