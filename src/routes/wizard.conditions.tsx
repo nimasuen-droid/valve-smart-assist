@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReferenceBubble, WarningBanner } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
-// @ts-expect-error JS module
 import { SERVICE_TYPES, FLUID_TYPES, INSTALLATION_LOCATIONS } from "@/lib/valveSelectionEngine";
 
 export const Route = createFileRoute("/wizard/conditions")({

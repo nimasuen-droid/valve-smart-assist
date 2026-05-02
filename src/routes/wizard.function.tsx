@@ -5,7 +5,6 @@ import { GuidanceCard, ReferenceBubble } from "@/components/InfoCards";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useSelection } from "@/lib/SelectionContext";
-// @ts-expect-error JS module
 import { VALVE_FUNCTIONS } from "@/lib/valveSelectionEngine";
 
 export const Route = createFileRoute("/wizard/function")({
