@@ -52,13 +52,22 @@ function ReportPage() {
   ];
 
   const exportPdf = () => {
-    const html = generatePdfHtml({ ...input, ...result, status: "Issued for Review" }) as string;
     const w = window.open("", "_blank");
     if (w) {
-      w.document.write(html);
+      w.document.write(datasheetHtml);
       w.document.close();
       setTimeout(() => w.print(), 400);
     }
+  };
+
+  const downloadHtml = () => {
+    const blob = new Blob([datasheetHtml], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ValveDatasheet_${input.tagNumber || "draft"}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const onSave = () => {
