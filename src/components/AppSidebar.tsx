@@ -12,6 +12,10 @@ import {
   LayoutDashboard,
   Wrench,
   Save,
+  Info,
+  FileText as FileTextIcon,
+  Sparkles,
+  Scale,
 } from "lucide-react";
 import {
   Sidebar,
