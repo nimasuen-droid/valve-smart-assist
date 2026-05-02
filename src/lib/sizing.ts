@@ -25,31 +25,33 @@ export type Phase = "liquid" | "gas";
 
 export interface SizingInputs {
   phase: Phase;
-  // Common
   inletPressureBarg: number;       // P1 (gauge)
   pressureDropBar: number;         // dP across valve
   temperatureC: number;            // flowing temp
   // Liquid
-  flowRate_m3h?: number;           // volumetric flow (liquid)
-  specificGravity?: number;        // SG (water = 1)
-  vaporPressureBara?: number;      // Pv (absolute), default 0
+  flowRate_m3h?: number;
+  specificGravity?: number;
+  vaporPressureBara?: number;      // Pv
+  criticalPressureBara?: number;   // Pc — defaults 220.6 (water-like) if absent
   // Gas
-  flowRate_Nm3h?: number;          // standard volumetric (Normal m3/h @ 0°C, 1 atm)
-  gasSG?: number;                  // SG vs air (methane ~0.55)
-  k?: number;                      // specific heat ratio (default 1.4)
-  // Valve geometry assumption (for verdict)
-  selectedValveType?: string;      // e.g. "Globe Valve", "Ball Valve", "Butterfly Valve"
+  flowRate_Nm3h?: number;
+  gasSG?: number;                  // air = 1
+  molecularWeight?: number;        // alternative to SG (overrides if given)
+  compressibilityZ?: number;       // default 1.0
+  k?: number;                      // Cp/Cv default 1.4
+  selectedValveType?: string;
 }
 
 export interface SizingResult {
   ok: boolean;
   errors: string[];
-  // Outputs
   requiredCv: number;
-  requiredKv: number;          // Kv = Cv / 1.156
+  requiredKv: number;
   choked: boolean;
-  chokedDpBar?: number;        // dP at which choking starts
-  // Verdict against the selected valve's typical Cv per NPS
+  chokedDpBar?: number;
+  cavitating?: boolean;            // liquid: dP > FL^2*(P1-Pv) but P2>Pv
+  flashing?: boolean;              // liquid: P2 < Pv
+  expansionWarning?: boolean;      // gas: Y at floor (0.667)
   verdict: "PASS" | "REVIEW" | "UNDERSIZED" | "N/A";
   verdictNote: string;
   assumedXt: number;
