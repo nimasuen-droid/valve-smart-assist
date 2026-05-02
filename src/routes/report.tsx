@@ -32,6 +32,27 @@ function ReportPage() {
     [input, result],
   );
 
+  const sizing = useMemo(() => {
+    if (input.valveFunction !== "Throttling / Control") return null;
+    if (!input.sizingFlow || !input.sizingDp) return null;
+    const phase = input.sizingPhase ?? (input.fluidType?.toLowerCase().includes("gas") || input.fluidType === "Steam" ? "gas" : "liquid");
+    const s = runSizing({
+      phase,
+      inletPressureBarg: parseFloat(input.sizingInletP ?? input.operatingPressure ?? input.designPressure ?? ""),
+      pressureDropBar: parseFloat(input.sizingDp),
+      temperatureC: parseFloat(input.sizingTemp ?? input.operatingTemp ?? input.designTemp ?? ""),
+      flowRate_m3h: phase === "liquid" ? parseFloat(input.sizingFlow) : undefined,
+      flowRate_Nm3h: phase === "gas" ? parseFloat(input.sizingFlow) : undefined,
+      specificGravity: phase === "liquid" ? parseFloat(input.sizingSG ?? "1") : undefined,
+      vaporPressureBara: phase === "liquid" ? parseFloat(input.sizingPv ?? "0") : undefined,
+      gasSG: phase === "gas" ? parseFloat(input.sizingSG ?? "0.65") : undefined,
+      k: phase === "gas" ? parseFloat(input.sizingK ?? "1.3") : undefined,
+      selectedValveType: result.valveType,
+    });
+    const v = evaluateAgainstValve(s, result.valveType, input.pipeSize);
+    return { s, v };
+  }, [input, result.valveType, result.valveSubtype, input.pipeSize]);
+
   const spec: [string, string][] = [
     ["Valve type", result.valveType],
     ["Valve subtype", result.valveSubtype],
