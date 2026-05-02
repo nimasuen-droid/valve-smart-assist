@@ -101,7 +101,6 @@ function ReportPage() {
           <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={exportPdf}>
             <Printer className="h-4 w-4" /> Export PDF
           </Button>
-          </Button>
         </div>
       </div>
 
