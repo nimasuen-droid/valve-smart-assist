@@ -67,9 +67,9 @@ function ReportPage() {
       k: phase === "gas" ? parseFloat(input.sizingK ?? "1.3") : undefined,
       selectedValveType: result.valveType,
     });
-    const v = evaluateAgainstValve(s, result.valveType, input.pipeSize);
+    const v = evaluateAgainstValve(s, result.valveType, input.valveSize || input.pipeSize);
     return { s, v };
-  }, [input, result.valveType, result.valveSubtype, input.pipeSize]);
+  }, [input, result.valveType, result.valveSubtype, input.pipeSize, input.valveSize]);
 
   const spec: [string, string][] = [
     ["Valve type", result.valveType],
@@ -166,7 +166,7 @@ function ReportPage() {
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Size / Class</p>
-            <p className="mt-1 text-sm font-mono">{input.pipeSize} · {input.pressureClass}</p>
+            <p className="mt-1 text-sm font-mono">Line {input.pipeSize}{input.valveSize && input.valveSize !== input.pipeSize ? ` · Valve ${input.valveSize}` : ""} · {input.pressureClass}</p>
             <p className="text-xs text-muted-foreground">{input.valveFunction}</p>
           </div>
           <div>
@@ -226,7 +226,7 @@ function ReportPage() {
                   </div>
                   {sizing.v.typicalCv !== undefined && (
                     <div className="flex items-baseline justify-between gap-4 py-2">
-                      <dt className="text-sm text-muted-foreground">Typical full-open Cv ({result.valveType} {input.pipeSize})</dt>
+                      <dt className="text-sm text-muted-foreground">Typical full-open Cv ({result.valveType} {input.valveSize || input.pipeSize})</dt>
                       <dd className="text-right text-sm font-medium font-mono">{sizing.v.typicalCv}</dd>
                     </div>
                   )}
