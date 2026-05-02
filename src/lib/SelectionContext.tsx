@@ -13,6 +13,17 @@ export interface SelectionInput {
   designPressure: string;
   installationLocation: string;
   additionalRequirements: string[];
+  // optional metadata (not required by the engine)
+  clientName?: string;
+  areaUnit?: string;
+  lineNumber?: string;
+  lineClass?: string;
+  operatingPressure?: string;
+  operatingTemp?: string;
+  flowCondition?: string;
+  notes?: string;
+  isSample?: boolean;
+  sampleTitle?: string;
 }
 
 const DEFAULT: SelectionInput = {
@@ -27,6 +38,7 @@ const DEFAULT: SelectionInput = {
   designPressure: "40",
   installationLocation: "Onshore - Open Air",
   additionalRequirements: [],
+  isSample: false,
 };
 
 interface Ctx {
