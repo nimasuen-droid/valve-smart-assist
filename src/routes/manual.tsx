@@ -108,9 +108,11 @@ function ManualPage() {
       <Card className="border-warning/30 bg-warning/5">
         <CardHeader><CardTitle className="text-base">Reminder</CardTitle></CardHeader>
         <CardContent className="text-sm text-foreground/90">
-          For engineering support only. Final design shall be reviewed and approved by a qualified piping
-          engineer against the governing project codes, standards, client specifications, and latest
-          approved revisions.
+          <p className="font-semibold">Decision-support tool only</p>
+          <p className="mt-1">
+            All outputs are screening aids. Verify against project specs, latest standards, and a
+            qualified piping engineer before issuing for procurement or fabrication.
+          </p>
         </CardContent>
       </Card>
     </div>
