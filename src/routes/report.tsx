@@ -24,6 +24,12 @@ export const Route = createFileRoute("/report")({
 
 function ReportPage() {
   const { input, result, asmeWarning, asmeRec } = useSelectionResult();
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  const datasheetHtml = useMemo(
+    () => generatePdfHtml({ ...input, ...result, status: "Issued for Review" }) as string,
+    [input, result],
+  );
 
   const spec: [string, string][] = [
     ["Valve type", result.valveType],
