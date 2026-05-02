@@ -15,7 +15,7 @@ import {
   Flame,
   Snowflake,
 } from "lucide-react";
-import { ReferenceBubble, WarningBanner } from "@/components/InfoCards";
+import { ReferenceBubble } from "@/components/InfoCards";
 
 export const Route = createFileRoute("/")({
   head: () => ({
