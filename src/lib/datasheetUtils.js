@@ -360,13 +360,12 @@ ${sectionHeader(10, "Revision &amp; Approval")}
 </div></body></html>`;
 }
 
-// ─── Excel export: Official Ball Valve Template (API 615) ───
+// ─── Excel export: structured Manual Valve Datasheet ───
 export function exportDatasheetToExcel(data) {
   const v = (snake, camel) => {
     const val = data[snake] ?? data[camel];
-    return val !== undefined && val !== null && val !== "" ? String(val) : "TBA";
+    return val !== undefined && val !== null && val !== "" ? String(val) : "";
   };
-  
   const today = format(new Date(), "dd-MMM-yyyy");
   const tag = v("tag_number", "tagNumber");
   const project = v("project_name", "projectName");
@@ -377,6 +376,7 @@ export function exportDatasheetToExcel(data) {
   const cls = v("pressure_class", "pressureClass");
   const dTemp = v("design_temp", "designTemp");
   const dPress = v("design_pressure", "designPressure");
+  const installLoc = v("installation_location", "installationLocation");
   const vType = v("valve_type", "valveType");
   const vSub = v("valve_subtype", "valveSubtype");
   const op = v("operator_type", "operator");
@@ -393,88 +393,104 @@ export function exportDatasheetToExcel(data) {
   const f2f = v("face_to_face_std", "faceToFaceStd");
   const flangeStd = v("flange_standard", "flangeStandard");
   const testStd = v("testing_standard", "testingStandard");
-  const fireSafe = (data.fire_safe ?? data.fireSafe) ? "Yes – API 607" : "No";
-  
-  const pressNum = parseFloat(dPress) || 0;
-  const tempNum = parseFloat(dTemp) || 0;
-  const classNum = parseInt((cls || "").replace(/\D/g, "")) || 150;
-  
-  const bonnetVal = bodySpec !== "TBA" ? bodySpec : "TBA";
-  const hydroRec = pressNum > 0 ? `${(pressNum * 1.5).toFixed(0)} barg (1.5× design) per API 598` : "TBA";
-  const radioRec = classNum >= 600 ? "Required — RT per ASME B16.34 §6.1 (Class ≥ 600)" : "Not required";
-  const dsNum = tag !== "TBA" ? `DS-${tag}` : "DS-TBA";
-  const ptRating = `ASME B16.5 ${cls}`;
+  const fireSafe = (data.fire_safe ?? data.fireSafe) ? "Yes" : "No";
+  const warnings = data.warnings || [];
+  const alternatives = data.alternatives || [];
+  const dsNum = tag ? `DS-${tag}` : "DS-XXXX";
 
-  const HEAD = "background:#4472C4;color:#fff;font-weight:700;border:1px solid #000;padding:3px 4px;font-size:9pt;text-align:center;";
-  const LBL = "background:#D9E1F2;font-weight:600;border:1px solid #000;padding:2px 4px;font-size:9pt;";
-  const VAL = "background:#fff;border:1px solid #000;padding:2px 4px;font-size:9pt;";
+  const TH = "background:#d9d9d9;font-weight:700;border:1px solid #000;padding:4px 6px;font-size:10pt;text-transform:uppercase;";
+  const SH = "background:#f2f2f2;font-weight:700;border:1px solid #000;padding:4px 6px;font-size:10pt;";
+  const LBL = "background:#fafafa;font-weight:600;border:1px solid #000;padding:3px 6px;font-size:10pt;";
+  const VAL = "background:#fff;border:1px solid #000;padding:3px 6px;font-size:10pt;";
 
-  const row2 = (l1, v1, l2, v2) => `<tr><td style="${LBL}">${l1}</td><td style="${VAL}">${v1 ?? ""}</td><td style="${LBL}">${l2}</td><td style="${VAL}">${v2 ?? ""}</td></tr>`;
-  const secRow = (left, right) => `<tr><td colspan="2" style="${HEAD}">${left}</td><td colspan="2" style="${HEAD}">${right}</td></tr>`;
-  const fullSec = (txt) => `<tr><td colspan="4" style="${HEAD}">${txt}</td></tr>`;
+  const sec = (n, title) => `<tr><td colspan="4" style="${SH}">SECTION ${n} — ${title.toUpperCase()}</td></tr>`;
+  const r2 = (l1, v1, l2, v2) =>
+    `<tr><td style="${LBL}">${l1}</td><td style="${VAL}">${v1 || ""}</td><td style="${LBL}">${l2}</td><td style="${VAL}">${v2 || ""}</td></tr>`;
+  const r1 = (l, v) => `<tr><td style="${LBL}">${l}</td><td colspan="3" style="${VAL}">${v || ""}</td></tr>`;
 
-  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:9pt;padding:6px;}table{border-collapse:collapse;width:100%;border:1px solid #000;}td{vertical-align:top;}</style></head><body><table><tbody>
-<tr><td colspan="4" style="text-align:center;font-weight:700;font-size:12pt;border:1px solid #000;padding:3px;background:#fff;">DATA SHEET FOR ${vType.toUpperCase()}</td></tr>
-<tr><td colspan="4" style="text-align:center;font-size:9pt;border:1px solid #000;padding:2px;background:#fff;">Per API 615 Recommended Practice</td></tr>
-${row2("Equipment Name:", `${vType}${vSub !== "TBA" ? " – " + vSub : ""}`, "Plant / Location:", project)}
-${row2("Service:", service, "Manufacturer:", "TBA")}
-${row2("Tag No.:", tag, "Make / Model:", "TBA")}
-${row2("P&amp;ID No.:", "TBA", "Supplier:", "TBA")}
-${row2("Requisition / P.O. No.:", "TBA", "Date:", today)}
-${row2("Datasheet No.:", dsNum, "Status:", data.status || "Draft")}
-${secRow("SERVICE DETAILS", "MATERIALS OF CONSTRUCTION")}
-${row2("Valve Number / Tag:", tag, "Body Material:", body)}
-${row2("Nominal Size (NPS):", size, "Body Material Spec:", bodySpec)}
-${row2("ANSI Rating (Class):", cls, "Seat Material:", seat)}
-${row2("End Connection:", endConn, "Ball Material:", disc)}
-${row2("Valve Type:", vType, "Stem Material:", stem)}
-${row2("Full Bore / Reduced Bore:", "Full Bore (FB)", "Packing Type / Material:", packing)}
-${row2("Valve Subtype / Construction:", vSub, "Gasket:", gasket)}
-${row2("Valve Function:", fn, "Bonnet Material:", bonnetVal)}
-${row2("Design Life:", "TBA", "Bolts &amp; Nuts:", "TBA")}
-${row2("Frequency of Operation:", "TBA", "Temperature Limits (Min/Max °C):", tempNum ? `TBA / ${dTemp}°C` : "TBA")}
-${row2("Operator / Turns to Close:", op, "Fire Safe:", fireSafe)}
-${secRow("PROCESS CONDITIONS", "STANDARDS &amp; TESTING")}
-${row2("Design Pressure:", dPress ? `${dPress} barg` : "TBA", "Valve Design Standard:", valveStd)}
-${row2("Design Temp. Min / Max:", tempNum ? `TBA / ${dTemp}°C` : "TBA", "Face-to-Face Standard:", f2f)}
-${row2("Operating Pressure:", "TBA", "Flange Standard:", flangeStd)}
-${row2("Operating Temperature:", "TBA", "End Connection Standard:", endStd)}
-${row2("Fluid Type / State:", fluid, "Testing Standard:", testStd)}
-${row2("Sour Service (NACE MR0175):", "N/A", "Hydrostatic Test:", hydroRec)}
-${row2("Fire Safe:", fireSafe, "Seat Leak Test:", "Per API 598 Table 2")}
-${row2("ANSI P-T Rating:", ptRating, "Material Certification:", "EN 10204 Type 3.1 — manufacturer")}
-${secRow("ADDITIONAL REQUIREMENTS", "EXTERNAL PROTECTION")}
-${row2("Actuator / Special Operator:", "TBA", "Painting:", "2-coat epoxy primer + topcoat, ISO 12944 C3")}
-${row2("ATEX / IECEx Required:", "N/A", "To suit environment:", "Onshore plant — carbon steel with primer + protective coating")}
-${row2("Low Emission (API 622):", "Yes – API 622 Class A", "To suit insulation over:", "N/A")}
-${row2("ESD / SIS Function:", "TBA", "Estimated Weight – Shipping (kg):", "TBA")}
-${row2("Bidirectional / Cavity Relief:", "TBA", "Estimated Weight – Operating (kg):", "TBA")}
-${row2("Face-to-Face Dimension (mm):", "TBA", "NACE MR0175 Required:", "N/A")}
-${fullSec("TEST REQUIREMENTS")}
-${row2("Hydrostatic Test:", hydroRec, "EAL Inspection:", "Manufacturer works inspection")}
-${row2("Leak Test:", "Per API 598 Table 2", "Material Certification:", "EN 10204 Type 3.1 — manufacturer")}
-${row2("Radiography:", radioRec, "NACE MR0175 Certification:", "N/A")}
-${fullSec("ENGINEERING NOTES &amp; WARNINGS")}
-${(data.warnings || []).map((w, i) => `<tr><td style="${LBL}">Note ${i + 1}:</td><td colspan="3" style="${VAL}">⚠ ${w}</td></tr>`).join("")}
-${(data.warnings || []).length < 5 ? `<tr><td style="${LBL}">Note ${(data.warnings || []).length + 1}:</td><td colspan="3" style="${VAL}">TBA — Additional notes to be added by engineer.</td></tr>` : ""}
-${(data.warnings || []).length < 4 ? `<tr><td style="${LBL}">Note ${(data.warnings || []).length + 2}:</td><td colspan="3" style="${VAL}">TBA</td></tr>` : ""}
-<tr><td style="${LBL}">Rev.</td><td style="${LBL}">Date</td><td style="${LBL}">Originated</td><td style="${LBL}">Checked</td></tr>
-<tr><td style="${VAL}">0</td><td style="${VAL}">${today}</td><td style="${VAL}">TBA</td><td style="${VAL}">TBA</td></tr>
-<tr><td colspan="2" style="border:1px solid #000;padding:2px 4px;font-size:8pt;">Generated by Valve Selection Guide — API 615 Based</td><td style="${LBL}">Client Name:</td><td style="${VAL}">TBA</td></tr>
-<tr><td colspan="2" style="border:1px solid #000;padding:2px 4px;"></td><td style="${LBL}">Project Title:</td><td style="${VAL}">${project}</td></tr>
-<tr><td colspan="2" style="border:1px solid #000;padding:2px 4px;"></td><td style="${LBL}">Datasheet No.:</td><td style="${VAL}">${dsNum}</td></tr>
-</tbody></table></body></html>`;
+  const isSour = service.toLowerCase().includes("sour") || service.toLowerCase().includes("h2s");
+  const phase = fluid.toLowerCase().includes("two") ? "Two-Phase" : fluid.toLowerCase().includes("gas") ? "Gas / Vapour" : fluid.toLowerCase().includes("steam") ? "Steam" : "Liquid";
+
+  const datasheetTable = `
+<table border="1" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">
+<tr><td colspan="4" style="${TH}text-align:center;font-size:13pt;">MANUAL VALVE DATASHEET</td></tr>
+${r2("Doc No.", dsNum, "Rev", "0")}
+${r2("Date", today, "Status", data.status || "Issued for Review")}
+${r2("Project", project, "Client", "")}
+${r2("Project No.", "", "Line No.", "")}
+${r2("Tag No.", tag, "Service", service)}
+${r2("Prepared By", "", "Checked By", "")}
+${r1("Approved By", "")}
+${sec(1, "Design Conditions")}
+${r2("Fluid / Service", service, "Phase", phase)}
+${r2("Design Pressure (barg)", dPress, "Design Temperature (°C)", dTemp)}
+${r2("Operating Pressure", "", "Operating Temperature", "")}
+${r2("Corrosion Allowance", isSour ? "3.0 mm" : "1.5 mm", "Special Service", isSour ? "Sour (NACE MR0175)" : "Standard")}
+${r1("Installation Location", installLoc)}
+${sec(2, "Valve Identification")}
+${r2("Valve Type", vType, "Valve Subtype", vSub)}
+${r2("Size (NPS)", size, "Pressure Class (ASME)", cls)}
+${r2("End Connection", endConn, "End Connection Std", endStd)}
+${r2("Face-to-Face Std", f2f, "Flange Standard", flangeStd)}
+${r2("Design Standard", valveStd, "Testing Standard", testStd)}
+${sec(3, "Materials of Construction")}
+${r2("Body Material", body, "Body Material Spec", bodySpec)}
+${r2("Bonnet / Cover", "", "Trim Material", disc)}
+${r2("Seat Material", seat, "Stem Material", stem)}
+${r2("Gasket", gasket, "Packing", packing)}
+${r1("Bolting", isSour ? "ASTM A193 B7M / A194 2HM (NACE)" : "ASTM A193 B7 / A194 2H")}
+${sec(4, "Features & Requirements")}
+${r2("Fire Safe (API 607)", fireSafe, "Anti-Static Device", "Yes")}
+${r2("Blow-out Proof Stem", "Yes", "Cavity Relief", "")}
+${r2("Fugitive Emission", "", "NACE MR0175", isSour ? "Required" : "Not required")}
+${r2("Oxygen Cleaned", "", "Cryogenic Extension", "")}
+${r2("Locking Device", "Yes", "Position Indicator", "Yes")}
+${sec(5, "Operation")}
+${r2("Operator Type", op, "Operation Requirement", "Manual")}
+${r2("Fail Position", "", "Direction of Operation", "Clockwise to Close")}
+${sec(6, "Installation & Service")}
+${r2("Installation Location", installLoc, "Orientation Limitation", "Any")}
+${r2("Pigging Requirement", "", "Bidirectional Sealing", "")}
+${sec(7, "Engineering Notes & Warnings")}
+${warnings.length
+  ? warnings.map((w, i) => `<tr><td style="${LBL}">Note ${i + 1}</td><td colspan="3" style="${VAL}">${w}</td></tr>`).join("")
+  : `<tr><td colspan="4" style="${VAL}">No engineering warnings.</td></tr>`}
+</table>`;
+
+  const altTable = `
+<br/><br/>
+<table border="1" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">
+<tr><td colspan="3" style="${TH}text-align:center;font-size:13pt;">ALTERNATIVES CONSIDERED</td></tr>
+<tr><td style="${SH}width:8%;">#</td><td style="${SH}width:30%;">Valve Type</td><td style="${SH}">Reason Rejected / Alternative Use</td></tr>
+${alternatives.length
+  ? alternatives.map((a, i) => `<tr><td style="${VAL}">${i + 1}</td><td style="${VAL}">${a.type}</td><td style="${VAL}">${a.reason}</td></tr>`).join("")
+  : `<tr><td colspan="3" style="${VAL}">None recorded.</td></tr>`}
+</table>`;
+
+  // Multi-sheet workbook via Excel XML "Spreadsheet 2003" workaround using HTML with x:Name sheets
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<!--[if gte mso 9]><xml>
+<x:ExcelWorkbook><x:ExcelWorksheets>
+<x:ExcelWorksheet><x:Name>Datasheet</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+<x:ExcelWorksheet><x:Name>Alternatives</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+</x:ExcelWorksheets></x:ExcelWorkbook>
+</xml><![endif]-->
+<style>body{font-family:Arial,sans-serif;}</style></head>
+<body>
+<div>${datasheetTable}</div>
+<div style="page-break-before:always;">${altTable}</div>
+</body></html>`;
 
   const blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `ValveDatasheet_${tag !== "TBA" ? tag : "Draft"}_${today}.xls`;
+  a.download = `ValveDatasheet_${tag || "Draft"}_${today}.xls`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// exportToExcel — alias used from SavedSelections page
 export function exportToExcel(data) {
   exportDatasheetToExcel(data);
 }
