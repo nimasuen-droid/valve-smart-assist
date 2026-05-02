@@ -2,6 +2,7 @@ import { Outlet, createRootRoute, HeadContent, Scripts, Link } from "@tanstack/r
 import appCss from "../styles.css?url";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { Toaster } from "@/components/ui/sonner";
 import { SelectionProvider } from "@/lib/SelectionContext";
 
@@ -64,10 +65,14 @@ function RootComponent() {
     <SelectionProvider>
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background grid-bg">
-        <AppSidebar />
+        <div className="hidden md:block">
+          <AppSidebar />
+        </div>
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
-            <SidebarTrigger />
+            <div className="hidden md:block">
+              <SidebarTrigger />
+            </div>
             <div className="flex flex-col">
               <h1 className="text-sm font-semibold leading-tight">Valve Selection Guide</h1>
               <p className="text-[11px] leading-tight text-muted-foreground">
@@ -79,10 +84,11 @@ function RootComponent() {
               Decision-support · verify with PE
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-8">
+          <main className="flex-1 p-4 pb-24 md:p-8 md:pb-8">
             <Outlet />
           </main>
         </div>
+        <MobileBottomNav />
       </div>
       <Toaster />
     </SidebarProvider>
