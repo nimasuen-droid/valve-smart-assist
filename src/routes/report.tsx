@@ -70,6 +70,11 @@ function ReportPage() {
     URL.revokeObjectURL(url);
   };
 
+  const exportExcel = () => {
+    exportDatasheetToExcel({ ...input, ...result, status: "Issued for Review" });
+    toast.success("Excel datasheet downloaded");
+  };
+
   const onSave = () => {
     const saved = saveSelection({ input, result });
     toast.success(`Saved as ${saved.id}`);
