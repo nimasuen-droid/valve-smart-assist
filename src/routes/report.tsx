@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye } from "lucide-react";
+import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet } from "lucide-react";
 import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { saveSelection } from "@/lib/selectionState";
 import { toast } from "sonner";
 // @ts-ignore - datasheetUtils is a JS module
-import { generatePdfHtml } from "@/lib/datasheetUtils";
+import { generatePdfHtml, exportDatasheetToExcel } from "@/lib/datasheetUtils";
 
 export const Route = createFileRoute("/report")({
   head: () => ({
