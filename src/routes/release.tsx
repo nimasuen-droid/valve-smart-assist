@@ -53,7 +53,7 @@ const RELEASES = [
   },
 ];
 
-export default function () { return <ReleasePage />; }
+
 
 function ReleasePage() {
   return (
