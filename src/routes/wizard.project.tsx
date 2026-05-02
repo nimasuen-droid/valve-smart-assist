@@ -107,9 +107,20 @@ function ProjectStep() {
             </Badge>
           )}
         </div>
-        <Button type="button" size="sm" variant="outline" onClick={loadSample}>
-          <Sparkles className="h-4 w-4" /> Load Sample Data
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={clearAll}
+            disabled={!hasUserData && !input.isSample}
+          >
+            <Eraser className="h-4 w-4" /> Clear All Fields
+          </Button>
+          <Button type="button" size="sm" variant="outline" onClick={loadSample}>
+            <Sparkles className="h-4 w-4" /> Load Sample Data
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
