@@ -84,6 +84,19 @@ function RootComponent() {
               Decision-support · verify with PE
             </div>
           </header>
+          <div
+            role="note"
+            aria-label="Engineering support disclaimer"
+            className="border-b border-warning/30 bg-warning/10 px-4 py-2 text-[11px] leading-snug text-warning md:px-8"
+          >
+            <span className="font-semibold uppercase tracking-wider">Disclaimer · Support tool only</span>
+            <span className="mx-2 opacity-50">·</span>
+            <span className="text-warning/90">
+              For engineering support only. Final design shall be reviewed and approved by a qualified piping
+              engineer against the governing project codes, standards, client specifications, and latest
+              approved revisions.
+            </span>
+          </div>
           <main className="flex-1 p-4 pb-24 md:p-8 md:pb-8">
             <Outlet />
           </main>
