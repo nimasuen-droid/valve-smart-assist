@@ -25,33 +25,31 @@ export type Phase = "liquid" | "gas";
 
 export interface SizingInputs {
   phase: Phase;
+  // Common
   inletPressureBarg: number;       // P1 (gauge)
   pressureDropBar: number;         // dP across valve
   temperatureC: number;            // flowing temp
   // Liquid
-  flowRate_m3h?: number;
-  specificGravity?: number;
-  vaporPressureBara?: number;      // Pv
-  criticalPressureBara?: number;   // Pc — defaults 220.6 (water-like) if absent
+  flowRate_m3h?: number;           // volumetric flow (liquid)
+  specificGravity?: number;        // SG (water = 1)
+  vaporPressureBara?: number;      // Pv (absolute), default 0
   // Gas
-  flowRate_Nm3h?: number;
-  gasSG?: number;                  // air = 1
-  molecularWeight?: number;        // alternative to SG (overrides if given)
-  compressibilityZ?: number;       // default 1.0
-  k?: number;                      // Cp/Cv default 1.4
-  selectedValveType?: string;
+  flowRate_Nm3h?: number;          // standard volumetric (Normal m3/h @ 0°C, 1 atm)
+  gasSG?: number;                  // SG vs air (methane ~0.55)
+  k?: number;                      // specific heat ratio (default 1.4)
+  // Valve geometry assumption (for verdict)
+  selectedValveType?: string;      // e.g. "Globe Valve", "Ball Valve", "Butterfly Valve"
 }
 
 export interface SizingResult {
   ok: boolean;
   errors: string[];
+  // Outputs
   requiredCv: number;
-  requiredKv: number;
+  requiredKv: number;          // Kv = Cv / 1.156
   choked: boolean;
-  chokedDpBar?: number;
-  cavitating?: boolean;            // liquid: dP > FL^2*(P1-Pv) but P2>Pv
-  flashing?: boolean;              // liquid: P2 < Pv
-  expansionWarning?: boolean;      // gas: Y at floor (0.667)
+  chokedDpBar?: number;        // dP at which choking starts
+  // Verdict against the selected valve's typical Cv per NPS
   verdict: "PASS" | "REVIEW" | "UNDERSIZED" | "N/A";
   verdictNote: string;
   assumedXt: number;
@@ -101,9 +99,6 @@ export function runSizing(inp: SizingInputs): SizingResult {
   let choked = false;
   let chokedDpBar: number | undefined;
   let Y: number | undefined;
-  let cavitating = false;
-  let flashing = false;
-  let expansionWarning = false;
 
   if (inp.phase === "liquid") {
     if (!inp.flowRate_m3h || inp.flowRate_m3h <= 0) errors.push("Liquid flow rate (m³/h) is required.");
@@ -113,33 +108,21 @@ export function runSizing(inp: SizingInputs): SizingResult {
     const Q_gpm = inp.flowRate_m3h! * M3H_TO_GPM;
     const SG = inp.specificGravity!;
     const Pv_bara = inp.vaporPressureBara ?? 0;
-    const Pc_bara = inp.criticalPressureBara && inp.criticalPressureBara > 0 ? inp.criticalPressureBara : 220.6;
     const FL = inp.selectedValveType === "Ball Valve" ? 0.6 : inp.selectedValveType === "Butterfly Valve" ? 0.7 : 0.9;
-    const FF = 0.96 - 0.28 * Math.sqrt(Pv_bara / Pc_bara);
-    const dP_choked_bar = FL * FL * (P1_bara - FF * Pv_bara);
+    const FF = 0.96 - 0.28 * Math.sqrt(Pv_bara / 220.6); // crit. pressure water ~220.6 bara approx
+    const dP_choked_bar = FL * FL * (inp.inletPressureBarg + 1.01325 - FF * Pv_bara);
     chokedDpBar = Math.max(0, dP_choked_bar);
     choked = inp.pressureDropBar >= chokedDpBar && chokedDpBar > 0;
     const dP_used_psi = (choked ? chokedDpBar! : inp.pressureDropBar) * BAR_TO_PSI;
 
     Cv = Q_gpm * Math.sqrt(SG / dP_used_psi);
-
-    // Cavitation / flashing
-    const P2_bara = P1_bara - inp.pressureDropBar;
-    if (Pv_bara > 0) {
-      flashing = P2_bara < Pv_bara;
-      // Incipient cavitation per Kc ≈ 0.7 * FL^2
-      const dP_cav = 0.7 * FL * FL * (P1_bara - Pv_bara);
-      cavitating = !flashing && inp.pressureDropBar >= dP_cav && dP_cav > 0;
-    }
   } else {
     // gas
     if (!inp.flowRate_Nm3h || inp.flowRate_Nm3h <= 0) errors.push("Gas flow rate (Nm³/h) is required.");
-    const sgEff = inp.molecularWeight && inp.molecularWeight > 0 ? inp.molecularWeight / 28.96 : inp.gasSG;
-    if (!sgEff || sgEff <= 0) errors.push("Gas SG or molecular weight is required.");
+    if (!inp.gasSG || inp.gasSG <= 0) errors.push("Gas specific gravity (vs air) is required.");
     if (errors.length) return { ok: false, errors, requiredCv: 0, requiredKv: 0, choked: false, verdict: "N/A", verdictNote: "Inputs incomplete.", assumedXt: xt, references: refs };
 
     const k = inp.k ?? 1.4;
-    const Z = inp.compressibilityZ && inp.compressibilityZ > 0 ? inp.compressibilityZ : 1.0;
     const Fk = k / 1.4;
     const x_actual = inp.pressureDropBar / P1_bara;
     const x_choked = Fk * xt;
@@ -148,16 +131,17 @@ export function runSizing(inp: SizingInputs): SizingResult {
     const x = Math.min(x_actual, x_choked);
 
     Y = Math.max(0.667, 1 - x / (3 * Fk * xt));
-    expansionWarning = Y <= 0.667 + 1e-6;
     const T_R = (inp.temperatureC + 273.15) * 9 / 5;
     const Q_scfh = inp.flowRate_Nm3h! * NM3H_TO_SCFH;
-    // Z correction inside sqrt
-    Cv = (Q_scfh / 1360) * Math.sqrt(sgEff! * T_R * Z) / (P1_psia * Y * Math.sqrt(x));
-    void dP_psi;
+    Cv = (Q_scfh / 1360) * Math.sqrt(inp.gasSG! * T_R) / (P1_psia * Y * Math.sqrt(x));
+    void dP_psi; // (kept for completeness)
   }
 
   const Kv = Cv / KV_FACTOR;
 
+  // Verdict: compare against typical Cv at NPS for selected valve type
+  let verdict: SizingResult["verdict"] = "N/A";
+  let verdictNote = "Selected valve type has no Cv reference table — verdict unavailable.";
   return {
     ok: true,
     errors: [],
@@ -165,11 +149,8 @@ export function runSizing(inp: SizingInputs): SizingResult {
     requiredKv: Kv,
     choked,
     chokedDpBar,
-    cavitating,
-    flashing,
-    expansionWarning,
-    verdict: "N/A",
-    verdictNote: "See evaluateAgainstValve() for verdict.",
+    verdict,
+    verdictNote,
     assumedXt: xt,
     expansionY: Y,
     references: refs,
