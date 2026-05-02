@@ -31,8 +31,6 @@ function ProjectStep() {
   );
 
   const clearAll = () => {
-    if (!hasUserData && !input.isSample) return;
-    if (!window.confirm("Clear all project and service condition inputs?")) return;
     reset();
     toast.success("All fields cleared.");
   };
@@ -108,17 +106,11 @@ function ProjectStep() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={clearAll}
-            disabled={!hasUserData && !input.isSample}
-          >
-            <Eraser className="h-4 w-4" /> Clear All Fields
-          </Button>
           <Button type="button" size="sm" variant="outline" onClick={loadSample}>
             <Sparkles className="h-4 w-4" /> Load Sample Data
+          </Button>
+          <Button type="button" size="sm" variant="destructive" onClick={clearAll}>
+            <Eraser className="h-4 w-4" /> Clear All Fields
           </Button>
         </div>
       </div>
