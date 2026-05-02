@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge } from "lucide-react";
+import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown } from "lucide-react";
 import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { saveSelection } from "@/lib/selectionState";
@@ -12,6 +12,24 @@ import { runSizing, evaluateAgainstValve } from "@/lib/sizing";
 import { toast } from "sonner";
 // @ts-ignore - datasheetUtils is a JS module
 import { generatePdfHtml, exportDatasheetToExcel } from "@/lib/datasheetUtils";
+
+function MSection({ title, icon, badge, defaultOpen = true, children }: { title: React.ReactNode; icon?: React.ReactNode; badge?: React.ReactNode; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Card>
+      <CardHeader
+        className="flex-row items-center gap-2 space-y-0 cursor-pointer md:cursor-default"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {icon}
+        <CardTitle className="text-base flex-1">{title}</CardTitle>
+        {badge}
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform md:hidden ${open ? "rotate-180" : ""}`} />
+      </CardHeader>
+      <CardContent className={`${open ? "block" : "hidden"} md:block`}>{children}</CardContent>
+    </Card>
+  );
+}
 
 export const Route = createFileRoute("/report")({
   head: () => ({
