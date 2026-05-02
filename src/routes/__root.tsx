@@ -85,19 +85,11 @@ function RootComponent() {
               Decision-support · verify with PE
             </div>
           </header>
-          <div
-            role="note"
-            aria-label="Decision-support disclaimer"
-            className="border-b border-warning/30 bg-warning/10 px-4 py-2 text-[11px] leading-snug text-warning md:px-8"
-          >
-            <span className="font-semibold uppercase tracking-wider">Decision-support tool only</span>
-            <span className="mx-2 opacity-50">·</span>
-            <span className="text-warning/90">
+          <main className="flex-1 space-y-4 p-4 pb-24 md:space-y-6 md:p-8 md:pb-8">
+            <WarningBanner title="Decision-support tool only">
               All outputs are screening aids. Verify against project specs, latest standards, and a
               qualified piping engineer before issuing for procurement or fabrication.
-            </span>
-          </div>
-          <main className="flex-1 p-4 pb-24 md:p-8 md:pb-8">
+            </WarningBanner>
             <Outlet />
           </main>
         </div>
