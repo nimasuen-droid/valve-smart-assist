@@ -181,6 +181,64 @@ function ReportPage() {
             </CardContent>
           </Card>
 
+          {sizing && (
+            <Card>
+              <CardHeader className="flex-row items-center gap-2 space-y-0">
+                <Gauge className="h-5 w-5 text-primary" />
+                <CardTitle className="text-base">Control valve sizing (IEC 60534)</CardTitle>
+                <Badge
+                  className={`ml-auto ${
+                    sizing.v.verdict === "PASS" ? "border-success/40 bg-success/10 text-success"
+                    : sizing.v.verdict === "REVIEW" ? "border-warning/40 bg-warning/10 text-warning"
+                    : sizing.v.verdict === "UNDERSIZED" ? "border-destructive/40 bg-destructive/10 text-destructive"
+                    : "border-border bg-muted text-muted-foreground"
+                  }`}
+                  variant="outline"
+                >
+                  {sizing.v.verdict}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                {!sizing.s.ok ? (
+                  <p className="text-sm text-muted-foreground">{sizing.s.errors.join(" ")}</p>
+                ) : (
+                  <dl className="divide-y divide-border">
+                    <div className="flex items-baseline justify-between gap-4 py-2">
+                      <dt className="text-sm text-muted-foreground">Required Cv</dt>
+                      <dd className="text-right text-sm font-medium font-mono">{sizing.s.requiredCv.toFixed(2)}</dd>
+                    </div>
+                    <div className="flex items-baseline justify-between gap-4 py-2">
+                      <dt className="text-sm text-muted-foreground">Required Kv</dt>
+                      <dd className="text-right text-sm font-medium font-mono">{sizing.s.requiredKv.toFixed(2)}</dd>
+                    </div>
+                    {sizing.v.typicalCv !== undefined && (
+                      <div className="flex items-baseline justify-between gap-4 py-2">
+                        <dt className="text-sm text-muted-foreground">Typical full-open Cv ({result.valveType} {input.pipeSize})</dt>
+                        <dd className="text-right text-sm font-medium font-mono">{sizing.v.typicalCv}</dd>
+                      </div>
+                    )}
+                    {sizing.v.openingPct !== undefined && (
+                      <div className="flex items-baseline justify-between gap-4 py-2">
+                        <dt className="text-sm text-muted-foreground">Estimated valve opening</dt>
+                        <dd className="text-right text-sm font-medium font-mono">{sizing.v.openingPct.toFixed(0)} %</dd>
+                      </div>
+                    )}
+                    <div className="flex items-baseline justify-between gap-4 py-2">
+                      <dt className="text-sm text-muted-foreground">Choked flow</dt>
+                      <dd className="text-right text-sm font-medium font-mono">{sizing.s.choked ? `Yes — ΔP ≥ ${sizing.s.chokedDpBar?.toFixed(2)} bar` : "No"}</dd>
+                    </div>
+                  </dl>
+                )}
+                <p className="mt-3 rounded border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+                  {sizing.v.verdictNote}
+                </p>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Per IEC 60534-2-1 / ISA 75.01. Preliminary check — vendor sizing software required for final selection.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           {result.alternatives?.length > 0 && (
             <Card>
               <CardHeader>
