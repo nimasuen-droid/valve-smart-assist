@@ -33,6 +33,8 @@ export interface SelectionInput {
   sizingSG?: string;
   sizingPv?: string;
   sizingK?: string;
+  // Valve body size — defaults to line size (pipeSize) when undefined
+  valveSize?: string;
 }
 
 const DEFAULT: SelectionInput = {
