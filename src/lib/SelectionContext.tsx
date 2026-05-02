@@ -25,14 +25,19 @@ export interface SelectionInput {
   isSample?: boolean;
   sampleTitle?: string;
   // Sizing inputs (IEC 60534) — optional, used for throttling validation
+  enableSizing?: boolean;
   sizingPhase?: "liquid" | "gas";
-  sizingFlow?: string;
-  sizingInletP?: string;
-  sizingDp?: string;
-  sizingTemp?: string;
-  sizingSG?: string;
-  sizingPv?: string;
-  sizingK?: string;
+  sizingFlow?: string;          // m3/h liquid, Nm3/h gas
+  sizingInletP?: string;        // P1 barg
+  sizingOutletP?: string;       // P2 barg (optional, alternative to dP)
+  sizingDp?: string;            // bar
+  sizingTemp?: string;          // °C
+  sizingSG?: string;            // SG (liquid vs water, gas vs air)
+  sizingMW?: string;            // gas molecular weight (alt to SG)
+  sizingZ?: string;             // gas compressibility factor
+  sizingPv?: string;            // bara, liquid only
+  sizingPc?: string;            // bara, liquid critical pressure
+  sizingK?: string;             // gas Cp/Cv
 }
 
 const DEFAULT: SelectionInput = {
