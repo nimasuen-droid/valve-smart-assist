@@ -3,6 +3,7 @@ import appCss from "../styles.css?url";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { WarningBanner } from "@/components/InfoCards";
 import { Toaster } from "@/components/ui/sonner";
 import { SelectionProvider } from "@/lib/SelectionContext";
 
