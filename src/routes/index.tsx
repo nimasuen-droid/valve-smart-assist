@@ -175,12 +175,6 @@ function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          <WarningBanner title="Decision-support tool only">
-            All outputs are screening aids. Verify against project specs, latest standards, and a
-            qualified piping engineer before issuing for procurement or fabrication.
-          </WarningBanner>
-        </div>
       </section>
     </div>
   );
