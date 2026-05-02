@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown } from "lucide-react";
-import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
+import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { saveSelection } from "@/lib/selectionState";
 import { runSizing, evaluateAgainstValve } from "@/lib/sizing";
@@ -300,10 +300,17 @@ function ReportPage() {
 
         <div className="space-y-4">
           {asmeRec && (
-            <WhyCard>
-              <strong className="text-foreground">ASME B16.5 P-T check: </strong>
-              {asmeRec.note}
-            </WhyCard>
+            <>
+              <WhyCard>
+                <strong className="text-foreground">ASME B16.5 P-T check: </strong>
+                {asmeRec.note}
+              </WhyCard>
+              <LearningMoment>
+                The recommended class comes from cross-referencing your design pressure against the B16.5
+                P-T curve at design temperature, plus a margin for upset. Going one class higher gives
+                headroom but adds cost and weight; going lower risks derating below operating conditions.
+              </LearningMoment>
+            </>
           )}
           {asmeWarning && (
             <WarningBanner title={asmeWarning.type === "caution" ? "ASME B16.5 caution" : "ASME B16.5 rating exceeded"}>

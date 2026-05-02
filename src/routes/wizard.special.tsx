@@ -3,7 +3,7 @@ import { StepShell } from "@/components/StepShell";
 import { HelperField } from "@/components/HelperField";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { WarningBanner, ReferenceBubble, WhyCard } from "@/components/InfoCards";
+import { WarningBanner, ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { ADDITIONAL_REQUIREMENTS } from "@/lib/valveSelectionEngine";
@@ -31,7 +31,15 @@ function SpecialStep() {
       aside={
         <>
           {result.rationale.requirements && (
-            <WhyCard>{result.rationale.requirements.reason}</WhyCard>
+            <>
+              <WhyCard>{result.rationale.requirements.reason}</WhyCard>
+              <LearningMoment>
+                Special-service flags <strong>override defaults</strong>. Fire-safe (API 607/6FA) forces
+                metal secondary seats; sour service triggers NACE MR0175 hardness caps; cryogenic adds
+                extended bonnets; fugitive emissions (ISO 15848) drives low-emission packing. Each tick
+                tightens the material and design envelope — never treat them as optional.
+              </LearningMoment>
+            </>
           )}
           {result.warnings.slice(0, 4).map((w, i) => (
             <WarningBanner key={i} title="Engineering caution">{w}</WarningBanner>

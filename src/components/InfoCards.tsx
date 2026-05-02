@@ -1,6 +1,22 @@
 import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Lightbulb, BookOpen, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Lightbulb, BookOpen, ShieldCheck, GraduationCap } from "lucide-react";
+
+export function LearningMoment({ title = "Learning moment", children }: { title?: string; children: ReactNode }) {
+  return (
+    <div className="flex gap-3 rounded-lg border border-accent/40 bg-accent/10 p-3">
+      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/20">
+        <Lightbulb className="h-3.5 w-3.5 text-accent-foreground" />
+      </div>
+      <div className="space-y-1">
+        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-accent-foreground/80">
+          <GraduationCap className="h-3.5 w-3.5" /> {title}
+        </p>
+        <p className="text-sm leading-relaxed text-foreground/90">{children}</p>
+      </div>
+    </div>
+  );
+}
 
 export function WhyCard({ children }: { children: ReactNode }) {
   return (

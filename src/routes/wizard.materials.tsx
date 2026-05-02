@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { StepShell } from "@/components/StepShell";
 import { Card, CardContent } from "@/components/ui/card";
-import { ReferenceBubble, WhyCard } from "@/components/InfoCards";
+import { ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 
 export const Route = createFileRoute("/wizard/materials")({
@@ -32,14 +32,28 @@ function MaterialsStep() {
       aside={
         <>
           {result.rationale.bodyMaterial && (
-            <WhyCard>
-              <p className="mb-2"><strong className="text-foreground">Body: </strong>{result.rationale.bodyMaterial.reason}</p>
-            </WhyCard>
+            <>
+              <WhyCard>
+                <p className="mb-2"><strong className="text-foreground">Body: </strong>{result.rationale.bodyMaterial.reason}</p>
+              </WhyCard>
+              <LearningMoment>
+                Body material is set by <strong>fluid + temperature</strong>: WCB carbon steel covers most
+                hydrocarbons from −29 °C to 425 °C; LCC/LCB for low-temp service; CF8M (316SS) for corrosives
+                and cryogenic; chrome-moly (WC6/WC9) above 425 °C. Sour service adds NACE MR0175/ISO 15156 hardness limits.
+              </LearningMoment>
+            </>
           )}
           {result.rationale.trim && (
-            <WhyCard>
-              <p><strong className="text-foreground">Trim: </strong>{result.rationale.trim.reason}</p>
-            </WhyCard>
+            <>
+              <WhyCard>
+                <p><strong className="text-foreground">Trim: </strong>{result.rationale.trim.reason}</p>
+              </WhyCard>
+              <LearningMoment>
+                Trim (seat, disc, stem) handles the actual flow shear. It&apos;s typically harder than the
+                body — Stellite overlay or hardened 410SS resists erosion in throttling and high-velocity
+                service. Soft seats (PTFE/PEEK) give bubble-tight shutoff but cap the temperature rating.
+              </LearningMoment>
+            </>
           )}
           {Array.from(new Set(refs)).slice(0, 4).map((ref) => (
             <ReferenceBubble key={ref} standard={ref.split(/[(§]/)[0].trim()} note={ref} />
