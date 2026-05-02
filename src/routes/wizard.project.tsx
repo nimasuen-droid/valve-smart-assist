@@ -14,7 +14,7 @@ import {
   INSTALLATION_LOCATIONS,
   VALVE_FUNCTIONS,
 } from "@/lib/valveSelectionEngine";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Eraser } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/wizard/project")({
@@ -23,12 +23,19 @@ export const Route = createFileRoute("/wizard/project")({
 });
 
 function ProjectStep() {
-  const { input, update } = useSelection();
+  const { input, update, reset } = useSelection();
 
   const hasUserData = !!(
     input.projectName || input.tagNumber || input.lineNumber || input.clientName ||
     input.areaUnit || input.notes || input.operatingPressure || input.operatingTemp
   );
+
+  const clearAll = () => {
+    if (!hasUserData && !input.isSample) return;
+    if (!window.confirm("Clear all project and service condition inputs?")) return;
+    reset();
+    toast.success("All fields cleared.");
+  };
 
   const loadSample = () => {
     if (hasUserData && !input.isSample) {
@@ -100,9 +107,20 @@ function ProjectStep() {
             </Badge>
           )}
         </div>
-        <Button type="button" size="sm" variant="outline" onClick={loadSample}>
-          <Sparkles className="h-4 w-4" /> Load Sample Data
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={clearAll}
+            disabled={!hasUserData && !input.isSample}
+          >
+            <Eraser className="h-4 w-4" /> Clear All Fields
+          </Button>
+          <Button type="button" size="sm" variant="outline" onClick={loadSample}>
+            <Sparkles className="h-4 w-4" /> Load Sample Data
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
