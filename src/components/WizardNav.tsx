@@ -7,6 +7,7 @@ const STEPS = [
   { url: "/wizard/conditions", label: "Conditions" },
   { url: "/wizard/function", label: "Function" },
   { url: "/wizard/type", label: "Type" },
+  { url: "/wizard/sizing", label: "Sizing" },
   { url: "/wizard/materials", label: "Materials" },
   { url: "/wizard/ends", label: "Ends" },
   { url: "/wizard/special", label: "Special" },
