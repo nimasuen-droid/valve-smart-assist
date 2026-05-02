@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { StepShell } from "@/components/StepShell";
 import { HelperField } from "@/components/HelperField";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
+import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { PIPE_SIZES, PRESSURE_CLASSES } from "@/lib/valveSelectionEngine";
@@ -35,6 +35,11 @@ function EndsStep() {
               )}
             </WhyCard>
           )}
+          <LearningMoment>
+            Pressure class isn&apos;t just a number — ASME B16.5 derates allowable pressure as temperature rises.
+            A Class 300 flange holding 740 psi at ambient may only hold ~600 psi at 400 °C. Always check the
+            P-T table at <em>design temperature</em>, not ambient.
+          </LearningMoment>
           {asmeWarning && (
             <WarningBanner title={asmeWarning.type === "caution" ? "ASME B16.5 caution" : "ASME B16.5 rating exceeded"}>
               {asmeWarning.warning}
@@ -45,6 +50,13 @@ function EndsStep() {
               <strong className="text-foreground">End connection: </strong>
               {result.rationale.endConnection.reason}
             </WhyCard>
+          )}
+          {result.rationale.endConnection && (
+            <LearningMoment>
+              End connection follows size and service: socket-weld/threaded for small bore (≤2"),
+              flanged RF for general service, RTJ for high-pressure/temperature, and butt-weld where
+              leak paths must be eliminated. Match the gasket facing to the mating flange spec.
+            </LearningMoment>
           )}
           {endRefs.slice(0, 3).map((ref) => (
             <ReferenceBubble key={ref} standard={ref.split(/[(§]/)[0].trim()} note={ref} />

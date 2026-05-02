@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { StepShell } from "@/components/StepShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { ReferenceBubble, WhyCard } from "@/components/InfoCards";
+import { ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 
 export const Route = createFileRoute("/wizard/type")({
@@ -21,6 +21,12 @@ function TypeStep() {
       aside={
         <>
           <WhyCard>{r?.reason || "Selection rationale will appear once inputs are complete."}</WhyCard>
+          <LearningMoment>
+            Valve type is driven by <strong>function first</strong> (isolation, throttling, check, relief),
+            then refined by service, size and class. Gate/ball/plug suit on-off duty; globe and control-ball
+            handle throttling; check valves prevent reverse flow. Picking the wrong family leads to seat
+            erosion, poor control, or unnecessary cost — body material can&apos;t fix a wrong type.
+          </LearningMoment>
           {r?.refs?.map((ref) => (
             <ReferenceBubble key={ref} standard={ref.split(/[(§]/)[0].trim()} note={ref} />
           ))}
