@@ -166,7 +166,7 @@ function ReportPage() {
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Size / Class</p>
-            <p className="mt-1 text-sm font-mono">{input.pipeSize} · {input.pressureClass}</p>
+            <p className="mt-1 text-sm font-mono">Line {input.pipeSize}{input.valveSize && input.valveSize !== input.pipeSize ? ` · Valve ${input.valveSize}` : ""} · {input.pressureClass}</p>
             <p className="text-xs text-muted-foreground">{input.valveFunction}</p>
           </div>
           <div>
