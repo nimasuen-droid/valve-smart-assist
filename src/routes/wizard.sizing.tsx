@@ -4,11 +4,14 @@ import { StepShell } from "@/components/StepShell";
 import { HelperField } from "@/components/HelperField";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { GuidanceCard, ReferenceBubble, WarningBanner } from "@/components/InfoCards";
 import { Badge } from "@/components/ui/badge";
 import { useSelection } from "@/lib/SelectionContext";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { runSizing, evaluateAgainstValve } from "@/lib/sizing";
+import { PIPE_SIZES } from "@/lib/valveSelectionEngine";
 
 export const Route = createFileRoute("/wizard/sizing")({
   head: () => ({ meta: [{ title: "Control Valve Sizing — Valve Selection Guide" }] }),
