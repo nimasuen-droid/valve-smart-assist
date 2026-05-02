@@ -209,7 +209,8 @@ function SizingStep() {
             <Row label="Required Cv" value={sizing.requiredCv.toFixed(2)} />
             <Row label="Required Kv" value={sizing.requiredKv.toFixed(2)} />
             <Row label="Selected valve type" value={`${result.valveType}${result.valveSubtype ? ` (${result.valveSubtype})` : ""}`} />
-            <Row label="Pipe size" value={input.pipeSize} />
+            <Row label="Line size" value={input.pipeSize} />
+            <Row label="Valve size" value={`${effectiveValveSize}${isOverride ? " (override)" : ""}`} />
             {verdict.typicalCv !== undefined && <Row label="Typical full-open Cv" value={String(verdict.typicalCv)} />}
             {verdict.openingPct !== undefined && <Row label="Estimated valve opening" value={`${verdict.openingPct.toFixed(0)} %`} />}
             <Row label="Choked flow" value={sizing.choked ? `Yes — choked at ΔP ≥ ${sizing.chokedDpBar?.toFixed(2)} bar` : "No"} />
