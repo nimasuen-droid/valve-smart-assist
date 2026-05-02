@@ -226,7 +226,7 @@ function ReportPage() {
                   </div>
                   {sizing.v.typicalCv !== undefined && (
                     <div className="flex items-baseline justify-between gap-4 py-2">
-                      <dt className="text-sm text-muted-foreground">Typical full-open Cv ({result.valveType} {input.pipeSize})</dt>
+                      <dt className="text-sm text-muted-foreground">Typical full-open Cv ({result.valveType} {input.valveSize || input.pipeSize})</dt>
                       <dd className="text-right text-sm font-medium font-mono">{sizing.v.typicalCv}</dd>
                     </div>
                   )}
