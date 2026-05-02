@@ -15,7 +15,7 @@ import {
   Flame,
   Snowflake,
 } from "lucide-react";
-import { ReferenceBubble, WarningBanner } from "@/components/InfoCards";
+import { ReferenceBubble } from "@/components/InfoCards";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -175,12 +175,6 @@ function Dashboard() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          <WarningBanner title="Decision-support tool only">
-            All outputs are screening aids. Verify against project specs, latest standards, and a
-            qualified piping engineer before issuing for procurement or fabrication.
-          </WarningBanner>
-        </div>
       </section>
     </div>
   );
