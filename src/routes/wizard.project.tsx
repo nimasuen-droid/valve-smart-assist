@@ -25,17 +25,17 @@ export const Route = createFileRoute("/wizard/project")({
 function ProjectStep() {
   const { input, update, reset } = useSelection();
 
+  const hasUserData = !!(
+    input.projectName || input.tagNumber || input.lineNumber || input.clientName ||
+    input.areaUnit || input.notes || input.operatingPressure || input.operatingTemp
+  );
+
   const clearAll = () => {
     if (!hasUserData && !input.isSample) return;
     if (!window.confirm("Clear all project and service condition inputs?")) return;
     reset();
     toast.success("All fields cleared.");
   };
-
-  const hasUserData = !!(
-    input.projectName || input.tagNumber || input.lineNumber || input.clientName ||
-    input.areaUnit || input.notes || input.operatingPressure || input.operatingTemp
-  );
 
   const loadSample = () => {
     if (hasUserData && !input.isSample) {
