@@ -42,7 +42,12 @@ function SizingStep() {
     });
   }, [input, phase, result.valveType]);
 
-  const verdict = useMemo(() => evaluateAgainstValve(sizing, result.valveType, input.pipeSize), [sizing, result.valveType, input.pipeSize]);
+  const effectiveValveSize = input.valveSize || input.pipeSize;
+  const isOverride = !!input.valveSize && input.valveSize !== input.pipeSize;
+  const verdict = useMemo(
+    () => evaluateAgainstValve(sizing, result.valveType, effectiveValveSize),
+    [sizing, result.valveType, effectiveValveSize],
+  );
 
   const verdictColor =
     verdict.verdict === "PASS" ? "border-success/40 bg-success/10 text-success"
