@@ -79,6 +79,70 @@ function SizingStep() {
         </>
       }
     >
+      {/* Valve size — same as line size by default, or override */}
+      <div className="mb-5 rounded-md border border-border bg-card/40 p-4">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold">Valve body size</p>
+            <p className="text-xs text-muted-foreground">
+              Defaults to line size. Override to size the valve smaller (or larger) than the line — common
+              for control valves to keep trim in the 20–80 % opening range.
+            </p>
+          </div>
+          {isOverride && (
+            <Badge variant="outline" className="border-warning/40 bg-warning/10 text-warning">
+              Override
+            </Badge>
+          )}
+        </div>
+        <RadioGroup
+          value={isOverride ? "override" : "same"}
+          onValueChange={(v) => {
+            if (v === "same") u({ valveSize: undefined });
+            else u({ valveSize: input.pipeSize });
+          }}
+          className="grid gap-2 md:grid-cols-2"
+        >
+          <Label
+            htmlFor="vsize-same"
+            className="flex cursor-pointer items-start gap-3 rounded-md border border-border bg-background/40 p-3 hover:border-primary/40"
+          >
+            <RadioGroupItem value="same" id="vsize-same" className="mt-0.5" />
+            <div>
+              <p className="text-sm font-medium">Same as line size</p>
+              <p className="text-xs text-muted-foreground font-mono">{input.pipeSize}</p>
+            </div>
+          </Label>
+          <Label
+            htmlFor="vsize-override"
+            className="flex cursor-pointer items-start gap-3 rounded-md border border-border bg-background/40 p-3 hover:border-primary/40"
+          >
+            <RadioGroupItem value="override" id="vsize-override" className="mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium">Override</p>
+              <Select
+                value={input.valveSize || input.pipeSize}
+                onValueChange={(v) => u({ valveSize: v })}
+                disabled={!isOverride}
+              >
+                <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {(PIPE_SIZES as string[]).map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </Label>
+        </RadioGroup>
+        {isOverride && (
+          <p className="mt-3 text-xs text-warning">
+            ⚠ {effectiveValveSize} valve on {input.pipeSize} line — concentric reducers required per ASME B16.5.
+            Account for added pressure drop in the ΔP allocation below.
+          </p>
+        )}
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2">
         <HelperField label="Fluid phase" helper="Drives the IEC 60534 equation set used.">
           <Select value={phase} onValueChange={(v) => u({ sizingPhase: v as "liquid" | "gas" })}>
