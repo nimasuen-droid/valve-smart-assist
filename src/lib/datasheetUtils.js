@@ -163,15 +163,16 @@ export function generatePdfHtml(data) {
     : "EN 10204 Type 3.1 — manufacturer";
   const naceRec     = isSour ? "Required — NACE MR0175 / ISO 15156" : "Not required";
 
-  // ── CSS helpers ──
-  const HDR  = "background:#1A365D;color:#fff;font-weight:700;padding:6px 10px;border:1px solid #999;";
-  const SUB  = "background:#2C5F8A;color:#fff;font-weight:600;padding:3px 8px;text-align:center;border:1px solid #999;font-size:9pt;";
-  const SHDR = "background:#BDD7EE;font-weight:700;text-align:center;border:1px solid #999;padding:3px 6px;font-size:9pt;text-transform:uppercase;letter-spacing:0.04em;";
-  const LBL  = "background:#D9E1F2;font-weight:600;border:1px solid #999;padding:2px 6px;white-space:nowrap;";
-  const VAL  = "background:#fff;border:1px solid #999;padding:2px 6px;";
-  const YEL  = "background:#FFFACD;border:1px solid #999;padding:2px 6px;";
-  const WARN = "background:#FFFBEB;border:1px solid #999;padding:2px 6px;border-left:3px solid #F59E0B;";
-  const GAP  = "border:none;width:8px;";
+  // ── CSS helpers — refined engineering palette ──
+  const BORDER = "1px solid #94a3b8";
+  const HDR  = `background:#0f172a;color:#fff;font-weight:600;padding:8px 12px;border:${BORDER};letter-spacing:0.02em;`;
+  const SUB  = `background:#1e293b;color:#cbd5e1;font-weight:500;padding:5px 10px;text-align:center;border:${BORDER};font-size:8.5pt;letter-spacing:0.06em;text-transform:uppercase;`;
+  const SHDR = `background:#334155;color:#fff;font-weight:600;text-align:left;border:${BORDER};padding:5px 10px;font-size:8.5pt;text-transform:uppercase;letter-spacing:0.08em;`;
+  const LBL  = `background:#f1f5f9;color:#0f172a;font-weight:500;border:${BORDER};padding:4px 8px;white-space:nowrap;`;
+  const VAL  = `background:#fff;color:#0f172a;border:${BORDER};padding:4px 8px;font-variant-numeric:tabular-nums;`;
+  const YEL  = `background:#fffbe6;color:#0f172a;border:${BORDER};padding:4px 8px;font-variant-numeric:tabular-nums;`;
+  const WARN = `background:#fffaf0;border:${BORDER};padding:5px 8px;border-left:3px solid #d97706;color:#7c2d12;`;
+  const GAP  = "border:none;width:10px;";
 
   // Two-column row helper: [label | value | gap | label | value]
   const row2 = (l1, v1, l2, v2, y1 = false, y2 = false) =>
@@ -211,28 +212,66 @@ export function generatePdfHtml(data) {
   <title>Valve Datasheet – ${tag}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 9pt; color: #111; padding: 10mm; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 4pt; }
-    td { vertical-align: middle; }
+    html, body { background: #f8fafc; }
+    body {
+      font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 9pt; color: #0f172a; padding: 14mm;
+      -webkit-font-smoothing: antialiased;
+    }
+    .sheet {
+      max-width: 1180px; margin: 0 auto; background: #fff;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.08), 0 8px 24px rgba(15,23,42,0.06);
+      padding: 14mm;
+    }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 6pt; }
+    td { vertical-align: middle; line-height: 1.35; }
+    .brand-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 14px; background:#0f172a; color:#fff;
+      border-radius: 4px 4px 0 0; margin-bottom: 0;
+    }
+    .brand-bar .logo {
+      width: 34px; height: 34px; border-radius: 6px;
+      background: linear-gradient(135deg,#3b82f6,#60a5fa);
+      display:inline-flex; align-items:center; justify-content:center;
+      font-weight:700; color:#0f172a; margin-right:10px;
+    }
+    .brand-left { display:flex; align-items:center; }
+    .brand-name { font-weight:600; font-size:11pt; letter-spacing:0.04em; }
+    .brand-sub { font-size:8pt; color:#94a3b8; margin-top:2px; letter-spacing:0.08em; text-transform:uppercase; }
+    .doc-title { text-align:right; }
+    .doc-title h1 { font-size:13pt; font-weight:600; letter-spacing:0.04em; }
+    .doc-title .meta { font-size:8.5pt; color:#cbd5e1; margin-top:2px; }
     @media print {
-      body { padding: 6mm; }
+      body { padding: 0; background:#fff; }
+      .sheet { box-shadow:none; padding: 8mm; max-width:none; }
       @page { size: A3 landscape; margin: 10mm; }
     }
   </style>
 </head>
 <body>
+<div class="sheet">
+
+<!-- ══ BRAND BAR ══ -->
+<div class="brand-bar">
+  <div class="brand-left">
+    <span class="logo">V</span>
+    <div>
+      <div class="brand-name">VALVE SELECTION GUIDE</div>
+      <div class="brand-sub">Engineering Datasheet · API 615</div>
+    </div>
+  </div>
+  <div class="doc-title">
+    <h1>DATA SHEET — ${vType.toUpperCase()}</h1>
+    <div class="meta">Doc No. ${dsNumber} &nbsp;·&nbsp; Rev 0 &nbsp;·&nbsp; ${today} &nbsp;·&nbsp; ${status}</div>
+  </div>
+</div>
+
 <table>
 <tbody>
 
-<!-- ══ HEADER ══ -->
-<tr>
-  <td colspan="2" rowspan="2" style="${HDR}font-size:13pt;">CONTRACTOR LOGO &amp; NAME</td>
-  <td style="${GAP}" rowspan="2"></td>
-  <td colspan="2" style="${HDR}font-size:11pt;text-align:center;">DATA SHEET FOR ${vType.toUpperCase()}</td>
-</tr>
-<tr>
-  <td colspan="2" style="${SUB}">Per API 615 Recommended Practice</td>
-</tr>
+<!-- ── Identity rows ── -->
+<tr><td colspan="5" style="height:8px;border:none;"></td></tr>
 
 <!-- ── Identity rows ── -->
 <tr>
@@ -384,6 +423,7 @@ ${warningRows}
 
 </tbody>
 </table>
+</div>
 </body>
 </html>`;
 }

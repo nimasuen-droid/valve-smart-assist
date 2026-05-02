@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye } from "lucide-react";
 import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { saveSelection } from "@/lib/selectionState";
@@ -22,6 +24,12 @@ export const Route = createFileRoute("/report")({
 
 function ReportPage() {
   const { input, result, asmeWarning, asmeRec } = useSelectionResult();
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  const datasheetHtml = useMemo(
+    () => generatePdfHtml({ ...input, ...result, status: "Issued for Review" }) as string,
+    [input, result],
+  );
 
   const spec: [string, string][] = [
     ["Valve type", result.valveType],
@@ -44,13 +52,22 @@ function ReportPage() {
   ];
 
   const exportPdf = () => {
-    const html = generatePdfHtml({ ...input, ...result, status: "Issued for Review" }) as string;
     const w = window.open("", "_blank");
     if (w) {
-      w.document.write(html);
+      w.document.write(datasheetHtml);
       w.document.close();
       setTimeout(() => w.print(), 400);
     }
+  };
+
+  const downloadHtml = () => {
+    const blob = new Blob([datasheetHtml], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ValveDatasheet_${input.tagNumber || "draft"}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const onSave = () => {
@@ -75,11 +92,14 @@ function ReportPage() {
           <Button variant="outline" size="sm" onClick={onSave}>
             <Save className="h-4 w-4" /> Save
           </Button>
-          <Button variant="outline" size="sm" onClick={() => typeof window !== "undefined" && window.print()}>
-            <Printer className="h-4 w-4" /> Print
+          <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
+            <Eye className="h-4 w-4" /> View Datasheet
+          </Button>
+          <Button variant="outline" size="sm" onClick={downloadHtml}>
+            <Download className="h-4 w-4" /> Download
           </Button>
           <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={exportPdf}>
-            <Download className="h-4 w-4" /> Export Datasheet
+            <Printer className="h-4 w-4" /> Export PDF
           </Button>
         </div>
       </div>
@@ -201,6 +221,31 @@ function ReportPage() {
           <ReferenceBubble standard="ASME B16.34" note="P-T ratings for flanged, threaded & welded valves." />
         </div>
       </div>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-6xl p-0 sm:rounded-lg overflow-hidden">
+          <DialogHeader className="border-b px-5 py-3">
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <FileText className="h-4 w-4 text-primary" /> Datasheet preview
+            </DialogTitle>
+          </DialogHeader>
+          <div className="bg-muted/40">
+            <iframe
+              title="Valve datasheet preview"
+              srcDoc={datasheetHtml}
+              className="h-[75vh] w-full border-0 bg-white"
+            />
+          </div>
+          <div className="flex flex-wrap items-center justify-end gap-2 border-t px-5 py-3">
+            <Button variant="outline" size="sm" onClick={downloadHtml}>
+              <Download className="h-4 w-4" /> Download HTML
+            </Button>
+            <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={exportPdf}>
+              <Printer className="h-4 w-4" /> Print / Export PDF
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
