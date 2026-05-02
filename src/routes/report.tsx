@@ -67,9 +67,9 @@ function ReportPage() {
       k: phase === "gas" ? parseFloat(input.sizingK ?? "1.3") : undefined,
       selectedValveType: result.valveType,
     });
-    const v = evaluateAgainstValve(s, result.valveType, input.pipeSize);
+    const v = evaluateAgainstValve(s, result.valveType, input.valveSize || input.pipeSize);
     return { s, v };
-  }, [input, result.valveType, result.valveSubtype, input.pipeSize]);
+  }, [input, result.valveType, result.valveSubtype, input.pipeSize, input.valveSize]);
 
   const spec: [string, string][] = [
     ["Valve type", result.valveType],
