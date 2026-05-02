@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as ReferencesRouteImport } from './routes/references'
@@ -22,6 +23,11 @@ import { Route as WizardFunctionRouteImport } from './routes/wizard.function'
 import { Route as WizardEndsRouteImport } from './routes/wizard.ends'
 import { Route as WizardConditionsRouteImport } from './routes/wizard.conditions'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SavedRoute = SavedRouteImport.update({
   id: '/saved',
   path: '/saved',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/references': typeof ReferencesRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
+  '/settings': typeof SettingsRoute
   '/wizard/conditions': typeof WizardConditionsRoute
   '/wizard/ends': typeof WizardEndsRoute
   '/wizard/function': typeof WizardFunctionRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/references': typeof ReferencesRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
+  '/settings': typeof SettingsRoute
   '/wizard/conditions': typeof WizardConditionsRoute
   '/wizard/ends': typeof WizardEndsRoute
   '/wizard/function': typeof WizardFunctionRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/references': typeof ReferencesRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
+  '/settings': typeof SettingsRoute
   '/wizard/conditions': typeof WizardConditionsRoute
   '/wizard/ends': typeof WizardEndsRoute
   '/wizard/function': typeof WizardFunctionRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/references'
     | '/report'
     | '/saved'
+    | '/settings'
     | '/wizard/conditions'
     | '/wizard/ends'
     | '/wizard/function'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/references'
     | '/report'
     | '/saved'
+    | '/settings'
     | '/wizard/conditions'
     | '/wizard/ends'
     | '/wizard/function'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/references'
     | '/report'
     | '/saved'
+    | '/settings'
     | '/wizard/conditions'
     | '/wizard/ends'
     | '/wizard/function'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   ReferencesRoute: typeof ReferencesRoute
   ReportRoute: typeof ReportRoute
   SavedRoute: typeof SavedRoute
+  SettingsRoute: typeof SettingsRoute
   WizardConditionsRoute: typeof WizardConditionsRoute
   WizardEndsRoute: typeof WizardEndsRoute
   WizardFunctionRoute: typeof WizardFunctionRoute
@@ -188,6 +201,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/saved': {
       id: '/saved'
       path: '/saved'
@@ -280,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReferencesRoute: ReferencesRoute,
   ReportRoute: ReportRoute,
   SavedRoute: SavedRoute,
+  SettingsRoute: SettingsRoute,
   WizardConditionsRoute: WizardConditionsRoute,
   WizardEndsRoute: WizardEndsRoute,
   WizardFunctionRoute: WizardFunctionRoute,
