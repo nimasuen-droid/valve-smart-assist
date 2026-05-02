@@ -232,6 +232,14 @@ function ReportPage() {
                 <p className="mt-3 rounded border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
                   {sizing.v.verdictNote}
                 </p>
+                {(sizing.s.flashing || sizing.s.cavitating || sizing.s.choked || sizing.s.expansionWarning) && (
+                  <div className="mt-2 space-y-1 text-xs">
+                    {sizing.s.flashing && <p className="text-destructive">⚠ Flashing — hardened trim required.</p>}
+                    {sizing.s.cavitating && !sizing.s.flashing && <p className="text-warning">⚠ Cavitating — anti-cavitation trim required.</p>}
+                    {sizing.s.choked && <p className="text-warning">⚠ Choked flow at design ΔP.</p>}
+                    {sizing.s.expansionWarning && <p className="text-warning">⚠ Gas expansion factor Y at floor (0.667).</p>}
+                  </div>
+                )}
                 <p className="mt-2 text-[11px] text-muted-foreground">
                   Per IEC 60534-2-1 / ISA 75.01. Preliminary check — vendor sizing software required for final selection.
                 </p>
