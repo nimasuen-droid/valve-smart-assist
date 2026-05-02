@@ -14,7 +14,7 @@ import {
   INSTALLATION_LOCATIONS,
   VALVE_FUNCTIONS,
 } from "@/lib/valveSelectionEngine";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Eraser } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/wizard/project")({
