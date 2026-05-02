@@ -9,38 +9,173 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReportRouteImport } from './routes/report'
+import { Route as ReferencesRouteImport } from './routes/references'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WizardTypeRouteImport } from './routes/wizard.type'
+import { Route as WizardSpecialRouteImport } from './routes/wizard.special'
+import { Route as WizardProjectRouteImport } from './routes/wizard.project'
+import { Route as WizardMaterialsRouteImport } from './routes/wizard.materials'
+import { Route as WizardFunctionRouteImport } from './routes/wizard.function'
+import { Route as WizardEndsRouteImport } from './routes/wizard.ends'
+import { Route as WizardConditionsRouteImport } from './routes/wizard.conditions'
 
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferencesRoute = ReferencesRouteImport.update({
+  id: '/references',
+  path: '/references',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WizardTypeRoute = WizardTypeRouteImport.update({
+  id: '/wizard/type',
+  path: '/wizard/type',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WizardSpecialRoute = WizardSpecialRouteImport.update({
+  id: '/wizard/special',
+  path: '/wizard/special',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WizardProjectRoute = WizardProjectRouteImport.update({
+  id: '/wizard/project',
+  path: '/wizard/project',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WizardMaterialsRoute = WizardMaterialsRouteImport.update({
+  id: '/wizard/materials',
+  path: '/wizard/materials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WizardFunctionRoute = WizardFunctionRouteImport.update({
+  id: '/wizard/function',
+  path: '/wizard/function',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WizardEndsRoute = WizardEndsRouteImport.update({
+  id: '/wizard/ends',
+  path: '/wizard/ends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WizardConditionsRoute = WizardConditionsRouteImport.update({
+  id: '/wizard/conditions',
+  path: '/wizard/conditions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/references': typeof ReferencesRoute
+  '/report': typeof ReportRoute
+  '/wizard/conditions': typeof WizardConditionsRoute
+  '/wizard/ends': typeof WizardEndsRoute
+  '/wizard/function': typeof WizardFunctionRoute
+  '/wizard/materials': typeof WizardMaterialsRoute
+  '/wizard/project': typeof WizardProjectRoute
+  '/wizard/special': typeof WizardSpecialRoute
+  '/wizard/type': typeof WizardTypeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/references': typeof ReferencesRoute
+  '/report': typeof ReportRoute
+  '/wizard/conditions': typeof WizardConditionsRoute
+  '/wizard/ends': typeof WizardEndsRoute
+  '/wizard/function': typeof WizardFunctionRoute
+  '/wizard/materials': typeof WizardMaterialsRoute
+  '/wizard/project': typeof WizardProjectRoute
+  '/wizard/special': typeof WizardSpecialRoute
+  '/wizard/type': typeof WizardTypeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/references': typeof ReferencesRoute
+  '/report': typeof ReportRoute
+  '/wizard/conditions': typeof WizardConditionsRoute
+  '/wizard/ends': typeof WizardEndsRoute
+  '/wizard/function': typeof WizardFunctionRoute
+  '/wizard/materials': typeof WizardMaterialsRoute
+  '/wizard/project': typeof WizardProjectRoute
+  '/wizard/special': typeof WizardSpecialRoute
+  '/wizard/type': typeof WizardTypeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/references'
+    | '/report'
+    | '/wizard/conditions'
+    | '/wizard/ends'
+    | '/wizard/function'
+    | '/wizard/materials'
+    | '/wizard/project'
+    | '/wizard/special'
+    | '/wizard/type'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/references'
+    | '/report'
+    | '/wizard/conditions'
+    | '/wizard/ends'
+    | '/wizard/function'
+    | '/wizard/materials'
+    | '/wizard/project'
+    | '/wizard/special'
+    | '/wizard/type'
+  id:
+    | '__root__'
+    | '/'
+    | '/references'
+    | '/report'
+    | '/wizard/conditions'
+    | '/wizard/ends'
+    | '/wizard/function'
+    | '/wizard/materials'
+    | '/wizard/project'
+    | '/wizard/special'
+    | '/wizard/type'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ReferencesRoute: typeof ReferencesRoute
+  ReportRoute: typeof ReportRoute
+  WizardConditionsRoute: typeof WizardConditionsRoute
+  WizardEndsRoute: typeof WizardEndsRoute
+  WizardFunctionRoute: typeof WizardFunctionRoute
+  WizardMaterialsRoute: typeof WizardMaterialsRoute
+  WizardProjectRoute: typeof WizardProjectRoute
+  WizardSpecialRoute: typeof WizardSpecialRoute
+  WizardTypeRoute: typeof WizardTypeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/references': {
+      id: '/references'
+      path: '/references'
+      fullPath: '/references'
+      preLoaderRoute: typeof ReferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +183,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wizard/type': {
+      id: '/wizard/type'
+      path: '/wizard/type'
+      fullPath: '/wizard/type'
+      preLoaderRoute: typeof WizardTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wizard/special': {
+      id: '/wizard/special'
+      path: '/wizard/special'
+      fullPath: '/wizard/special'
+      preLoaderRoute: typeof WizardSpecialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wizard/project': {
+      id: '/wizard/project'
+      path: '/wizard/project'
+      fullPath: '/wizard/project'
+      preLoaderRoute: typeof WizardProjectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wizard/materials': {
+      id: '/wizard/materials'
+      path: '/wizard/materials'
+      fullPath: '/wizard/materials'
+      preLoaderRoute: typeof WizardMaterialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wizard/function': {
+      id: '/wizard/function'
+      path: '/wizard/function'
+      fullPath: '/wizard/function'
+      preLoaderRoute: typeof WizardFunctionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wizard/ends': {
+      id: '/wizard/ends'
+      path: '/wizard/ends'
+      fullPath: '/wizard/ends'
+      preLoaderRoute: typeof WizardEndsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wizard/conditions': {
+      id: '/wizard/conditions'
+      path: '/wizard/conditions'
+      fullPath: '/wizard/conditions'
+      preLoaderRoute: typeof WizardConditionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ReferencesRoute: ReferencesRoute,
+  ReportRoute: ReportRoute,
+  WizardConditionsRoute: WizardConditionsRoute,
+  WizardEndsRoute: WizardEndsRoute,
+  WizardFunctionRoute: WizardFunctionRoute,
+  WizardMaterialsRoute: WizardMaterialsRoute,
+  WizardProjectRoute: WizardProjectRoute,
+  WizardSpecialRoute: WizardSpecialRoute,
+  WizardTypeRoute: WizardTypeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
