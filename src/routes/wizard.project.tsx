@@ -31,8 +31,6 @@ function ProjectStep() {
   );
 
   const clearAll = () => {
-    if (!hasUserData && !input.isSample) return;
-    if (!window.confirm("Clear all project and service condition inputs?")) return;
     reset();
     toast.success("All fields cleared.");
   };
