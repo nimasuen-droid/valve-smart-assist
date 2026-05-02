@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { WarningBanner, ReferenceBubble, WhyCard } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { useSelectionResult } from "@/lib/useSelectionResult";
-// @ts-expect-error JS module
 import { ADDITIONAL_REQUIREMENTS } from "@/lib/valveSelectionEngine";
 
 export const Route = createFileRoute("/wizard/special")({

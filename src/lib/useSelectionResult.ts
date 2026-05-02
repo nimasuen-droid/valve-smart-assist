@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import { useSelection } from "./SelectionContext";
-// @ts-expect-error JS module
 import { selectValve } from "./valveSelectionEngine";
-// @ts-expect-error JS module
 import { checkAsmeB165Rating, recommendPressureClass } from "./asmeB165Ratings";
 
 export interface RationaleEntry {

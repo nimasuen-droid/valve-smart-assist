@@ -5,7 +5,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { useSelectionResult } from "@/lib/useSelectionResult";
-// @ts-expect-error JS module
 import { PIPE_SIZES, PRESSURE_CLASSES } from "@/lib/valveSelectionEngine";
 
 export const Route = createFileRoute("/wizard/ends")({
