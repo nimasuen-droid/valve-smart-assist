@@ -163,15 +163,16 @@ export function generatePdfHtml(data) {
     : "EN 10204 Type 3.1 — manufacturer";
   const naceRec     = isSour ? "Required — NACE MR0175 / ISO 15156" : "Not required";
 
-  // ── CSS helpers ──
-  const HDR  = "background:#1A365D;color:#fff;font-weight:700;padding:6px 10px;border:1px solid #999;";
-  const SUB  = "background:#2C5F8A;color:#fff;font-weight:600;padding:3px 8px;text-align:center;border:1px solid #999;font-size:9pt;";
-  const SHDR = "background:#BDD7EE;font-weight:700;text-align:center;border:1px solid #999;padding:3px 6px;font-size:9pt;text-transform:uppercase;letter-spacing:0.04em;";
-  const LBL  = "background:#D9E1F2;font-weight:600;border:1px solid #999;padding:2px 6px;white-space:nowrap;";
-  const VAL  = "background:#fff;border:1px solid #999;padding:2px 6px;";
-  const YEL  = "background:#FFFACD;border:1px solid #999;padding:2px 6px;";
-  const WARN = "background:#FFFBEB;border:1px solid #999;padding:2px 6px;border-left:3px solid #F59E0B;";
-  const GAP  = "border:none;width:8px;";
+  // ── CSS helpers — refined engineering palette ──
+  const BORDER = "1px solid #94a3b8";
+  const HDR  = `background:#0f172a;color:#fff;font-weight:600;padding:8px 12px;border:${BORDER};letter-spacing:0.02em;`;
+  const SUB  = `background:#1e293b;color:#cbd5e1;font-weight:500;padding:5px 10px;text-align:center;border:${BORDER};font-size:8.5pt;letter-spacing:0.06em;text-transform:uppercase;`;
+  const SHDR = `background:#334155;color:#fff;font-weight:600;text-align:left;border:${BORDER};padding:5px 10px;font-size:8.5pt;text-transform:uppercase;letter-spacing:0.08em;`;
+  const LBL  = `background:#f1f5f9;color:#0f172a;font-weight:500;border:${BORDER};padding:4px 8px;white-space:nowrap;`;
+  const VAL  = `background:#fff;color:#0f172a;border:${BORDER};padding:4px 8px;font-variant-numeric:tabular-nums;`;
+  const YEL  = `background:#fffbe6;color:#0f172a;border:${BORDER};padding:4px 8px;font-variant-numeric:tabular-nums;`;
+  const WARN = `background:#fffaf0;border:${BORDER};padding:5px 8px;border-left:3px solid #d97706;color:#7c2d12;`;
+  const GAP  = "border:none;width:10px;";
 
   // Two-column row helper: [label | value | gap | label | value]
   const row2 = (l1, v1, l2, v2, y1 = false, y2 = false) =>
