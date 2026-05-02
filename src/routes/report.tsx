@@ -101,7 +101,10 @@ function ReportPage() {
             <Eye className="h-4 w-4" /> View Datasheet
           </Button>
           <Button variant="outline" size="sm" onClick={downloadHtml}>
-            <Download className="h-4 w-4" /> Download
+            <Download className="h-4 w-4" /> Download HTML
+          </Button>
+          <Button variant="outline" size="sm" onClick={exportExcel}>
+            <FileSpreadsheet className="h-4 w-4" /> Export Excel
           </Button>
           <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={exportPdf}>
             <Printer className="h-4 w-4" /> Export PDF
