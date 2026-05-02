@@ -87,7 +87,7 @@ function RootComponent() {
           <main className="flex-1 p-4 pb-24 md:p-8 md:pb-8">
             <Outlet />
           </main>
-          <footer className="border-t border-border bg-background/60 px-4 py-3 pb-20 text-[11px] leading-snug text-muted-foreground md:px-8 md:pb-3">
+          <footer className="border-t border-warning/30 bg-warning/10 px-4 py-3 pb-20 text-[11px] leading-snug text-warning md:px-8 md:pb-3">
             <p>
               For engineering support only. Final design shall be reviewed and approved by a qualified
               piping engineer against the governing project codes, standards, client specifications, and
