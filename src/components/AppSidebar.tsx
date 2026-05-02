@@ -48,6 +48,13 @@ const outputItems = [
   { title: "Reference Library", url: "/references", icon: BookOpen },
 ];
 
+const helpItems = [
+  { title: "User Manual", url: "/manual", icon: FileTextIcon },
+  { title: "EULA", url: "/eula", icon: Scale },
+  { title: "About", url: "/about", icon: Info },
+  { title: "Release Notes", url: "/release", icon: Sparkles },
+];
+
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (url: string) => (url === "/" ? path === "/" : path.startsWith(url));
