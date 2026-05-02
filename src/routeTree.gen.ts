@@ -12,7 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as ReleaseRouteImport } from './routes/release'
 import { Route as ReferencesRouteImport } from './routes/references'
+import { Route as ManualRouteImport } from './routes/manual'
+import { Route as EulaRouteImport } from './routes/eula'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WizardTypeRouteImport } from './routes/wizard.type'
 import { Route as WizardSpecialRouteImport } from './routes/wizard.special'
@@ -38,9 +42,29 @@ const ReportRoute = ReportRouteImport.update({
   path: '/report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReleaseRoute = ReleaseRouteImport.update({
+  id: '/release',
+  path: '/release',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReferencesRoute = ReferencesRouteImport.update({
   id: '/references',
   path: '/references',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManualRoute = ManualRouteImport.update({
+  id: '/manual',
+  path: '/manual',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EulaRoute = EulaRouteImport.update({
+  id: '/eula',
+  path: '/eula',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -91,7 +115,11 @@ const WizardConditionsRoute = WizardConditionsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/eula': typeof EulaRoute
+  '/manual': typeof ManualRoute
   '/references': typeof ReferencesRoute
+  '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
@@ -106,7 +134,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/eula': typeof EulaRoute
+  '/manual': typeof ManualRoute
   '/references': typeof ReferencesRoute
+  '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
@@ -122,7 +154,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/eula': typeof EulaRoute
+  '/manual': typeof ManualRoute
   '/references': typeof ReferencesRoute
+  '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
@@ -139,7 +175,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/eula'
+    | '/manual'
     | '/references'
+    | '/release'
     | '/report'
     | '/saved'
     | '/settings'
@@ -154,7 +194,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/eula'
+    | '/manual'
     | '/references'
+    | '/release'
     | '/report'
     | '/saved'
     | '/settings'
@@ -169,7 +213,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/eula'
+    | '/manual'
     | '/references'
+    | '/release'
     | '/report'
     | '/saved'
     | '/settings'
@@ -185,7 +233,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  EulaRoute: typeof EulaRoute
+  ManualRoute: typeof ManualRoute
   ReferencesRoute: typeof ReferencesRoute
+  ReleaseRoute: typeof ReleaseRoute
   ReportRoute: typeof ReportRoute
   SavedRoute: typeof SavedRoute
   SettingsRoute: typeof SettingsRoute
@@ -222,11 +274,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/release': {
+      id: '/release'
+      path: '/release'
+      fullPath: '/release'
+      preLoaderRoute: typeof ReleaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/references': {
       id: '/references'
       path: '/references'
       fullPath: '/references'
       preLoaderRoute: typeof ReferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manual': {
+      id: '/manual'
+      path: '/manual'
+      fullPath: '/manual'
+      preLoaderRoute: typeof ManualRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eula': {
+      id: '/eula'
+      path: '/eula'
+      fullPath: '/eula'
+      preLoaderRoute: typeof EulaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -297,7 +377,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  EulaRoute: EulaRoute,
+  ManualRoute: ManualRoute,
   ReferencesRoute: ReferencesRoute,
+  ReleaseRoute: ReleaseRoute,
   ReportRoute: ReportRoute,
   SavedRoute: SavedRoute,
   SettingsRoute: SettingsRoute,
