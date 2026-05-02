@@ -84,25 +84,21 @@ function RootComponent() {
               Decision-support · verify with PE
             </div>
           </header>
+          <div
+            role="note"
+            aria-label="Decision-support disclaimer"
+            className="border-b border-warning/30 bg-warning/10 px-4 py-2 text-[11px] leading-snug text-warning md:px-8"
+          >
+            <span className="font-semibold uppercase tracking-wider">Decision-support tool only</span>
+            <span className="mx-2 opacity-50">·</span>
+            <span className="text-warning/90">
+              All outputs are screening aids. Verify against project specs, latest standards, and a
+              qualified piping engineer before issuing for procurement or fabrication.
+            </span>
+          </div>
           <main className="flex-1 p-4 pb-24 md:p-8 md:pb-8">
             <Outlet />
           </main>
-          <footer className="border-t border-warning/30 bg-warning/10 px-4 py-3 pb-20 text-[11px] leading-snug text-warning md:px-8 md:pb-3">
-            <p className="font-semibold uppercase tracking-wider text-warning">Decision-support tool only</p>
-            <p className="mt-1 text-warning/90">
-              All outputs are screening aids. Verify against project specs, latest standards, and a
-              qualified piping engineer before issuing for procurement or fabrication.
-            </p>
-            <nav className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-              <Link to="/about" className="hover:text-foreground hover:underline">About</Link>
-              <span className="opacity-30">·</span>
-              <Link to="/manual" className="hover:text-foreground hover:underline">User manual</Link>
-              <span className="opacity-30">·</span>
-              <Link to="/release" className="hover:text-foreground hover:underline">Release notes</Link>
-              <span className="opacity-30">·</span>
-              <Link to="/eula" className="hover:text-foreground hover:underline">EULA</Link>
-            </nav>
-          </footer>
         </div>
         <MobileBottomNav />
       </div>
