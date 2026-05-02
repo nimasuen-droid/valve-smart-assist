@@ -3,6 +3,7 @@ import appCss from "../styles.css?url";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { SelectionProvider } from "@/lib/SelectionContext";
 
 function NotFoundComponent() {
   return (
@@ -60,6 +61,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
+    <SelectionProvider>
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background grid-bg">
         <AppSidebar />
@@ -84,5 +86,6 @@ function RootComponent() {
       </div>
       <Toaster />
     </SidebarProvider>
+    </SelectionProvider>
   );
 }

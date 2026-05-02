@@ -11,6 +11,7 @@ import {
   BookOpen,
   LayoutDashboard,
   Wrench,
+  Save,
 } from "lucide-react";
 import {
   Sidebar,
@@ -39,6 +40,7 @@ const wizardItems = [
 
 const outputItems = [
   { title: "Recommendation Report", url: "/report", icon: FileText },
+  { title: "Saved Selections", url: "/saved", icon: Save },
   { title: "Reference Library", url: "/references", icon: BookOpen },
 ];
 
