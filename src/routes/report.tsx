@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye } from "lucide-react";
+import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet } from "lucide-react";
 import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { saveSelection } from "@/lib/selectionState";
 import { toast } from "sonner";
 // @ts-ignore - datasheetUtils is a JS module
-import { generatePdfHtml } from "@/lib/datasheetUtils";
+import { generatePdfHtml, exportDatasheetToExcel } from "@/lib/datasheetUtils";
 
 export const Route = createFileRoute("/report")({
   head: () => ({
@@ -70,6 +70,11 @@ function ReportPage() {
     URL.revokeObjectURL(url);
   };
 
+  const exportExcel = () => {
+    exportDatasheetToExcel({ ...input, ...result, status: "Issued for Review" });
+    toast.success("Excel datasheet downloaded");
+  };
+
   const onSave = () => {
     const saved = saveSelection({ input, result });
     toast.success(`Saved as ${saved.id}`);
@@ -96,7 +101,10 @@ function ReportPage() {
             <Eye className="h-4 w-4" /> View Datasheet
           </Button>
           <Button variant="outline" size="sm" onClick={downloadHtml}>
-            <Download className="h-4 w-4" /> Download
+            <Download className="h-4 w-4" /> Download HTML
+          </Button>
+          <Button variant="outline" size="sm" onClick={exportExcel}>
+            <FileSpreadsheet className="h-4 w-4" /> Export Excel
           </Button>
           <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={exportPdf}>
             <Printer className="h-4 w-4" /> Export PDF
