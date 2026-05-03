@@ -253,19 +253,46 @@ function ReportPage() {
             </MSection>
           )}
 
-          {result.alternatives?.length > 0 && (
+          {(engineResult.alternatives?.length > 0 || input.valveTypeOverride) && (
             <MSection
               icon={<AlertCircle className="h-4 w-4 text-warning" />}
               title="Alternatives & rejected options"
+              badge={input.valveTypeOverride ? <Badge variant="outline" className="border-warning/40 bg-warning/10 text-warning">Override active</Badge> : undefined}
               defaultOpen={false}
             >
+              <p className="mb-3 text-xs text-muted-foreground">
+                Click an alternative to override the engine recommendation. The report and datasheet will regenerate using your choice.
+              </p>
               <div className="space-y-2">
-                {result.alternatives.map((a, i) => (
-                  <div key={i} className="rounded-md border border-warning/30 bg-warning/5 p-3">
-                    <p className="text-sm font-medium">{a.type}</p>
-                    <p className="text-xs text-muted-foreground">{a.reason}</p>
+                {engineResult.valveType && input.valveTypeOverride && input.valveTypeOverride !== engineResult.valveType && (
+                  <div className="flex items-start justify-between gap-3 rounded-md border border-success/30 bg-success/5 p-3">
+                    <div>
+                      <p className="text-sm font-medium">{engineResult.valveType} <span className="text-xs text-muted-foreground">(engine recommendation)</span></p>
+                      <p className="text-xs text-muted-foreground">Restore the original engine pick.</p>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => update({ valveTypeOverride: "" })}>
+                      Restore
+                    </Button>
                   </div>
-                ))}
+                )}
+                {engineResult.alternatives.map((a, i) => {
+                  const active = input.valveTypeOverride === a.type;
+                  return (
+                    <div key={i} className={`flex items-start justify-between gap-3 rounded-md border p-3 ${active ? "border-warning bg-warning/10" : "border-warning/30 bg-warning/5"}`}>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{a.type}</p>
+                        <p className="text-xs text-muted-foreground">{a.reason}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={active ? "default" : "outline"}
+                        onClick={() => update({ valveTypeOverride: active ? "" : a.type })}
+                      >
+                        {active ? "Selected" : "Use this"}
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             </MSection>
           )}
