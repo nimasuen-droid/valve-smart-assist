@@ -63,7 +63,8 @@ export interface AsmeRec {
 export function useSelectionResult() {
   const { input } = useSelection();
   return useMemo(() => {
-    const result = selectValve(input) as SelectionResult;
+    const engineResult = selectValve(input) as SelectionResult;
+    const result = applyOverrides(engineResult, input);
     const asmeWarning = checkAsmeB165Rating({
       pressureClass: "Class " + input.pressureClass.replace("#", ""),
       designTemp: input.designTemp,
@@ -73,6 +74,63 @@ export function useSelectionResult() {
       designTemp: input.designTemp,
       designPressure: input.designPressure,
     }) as AsmeRec | null;
-    return { result, asmeWarning, asmeRec, input };
+    return { result, asmeWarning, asmeRec, input, engineResult };
   }, [input]);
+}
+
+type SelectionInputLite = {
+  valveTypeOverride?: string;
+  boreOverride?: "Full Bore" | "Reduced Bore" | "";
+};
+
+function applyOverrides(res: SelectionResult, input: SelectionInputLite): SelectionResult {
+  let out = res;
+  const typeOverride = input.valveTypeOverride?.trim();
+  if (typeOverride && typeOverride !== res.valveType) {
+    const alt = res.alternatives?.find((a) => a.type === typeOverride || a.type.startsWith(typeOverride));
+    const note = alt
+      ? `User override — originally rejected alternative selected. Engine recommended "${res.valveType}". Original rejection reason: ${alt.reason}`
+      : `User override — manually selected "${typeOverride}" in place of engine recommendation "${res.valveType}". Verify suitability against process conditions.`;
+    out = {
+      ...out,
+      valveType: typeOverride,
+      valveSubtype: typeOverride,
+      warnings: [
+        `MANUAL OVERRIDE: Valve type changed from engine pick "${res.valveType}" to "${typeOverride}". Engineering review required.`,
+        ...res.warnings,
+      ],
+      rationale: {
+        ...res.rationale,
+        valveType: {
+          reason: note,
+          rule: `User override — engine logic bypassed for valve type. Original rule: ${res.rationale?.valveType?.rule ?? "n/a"}`,
+          refs: res.rationale?.valveType?.refs,
+        },
+      },
+    };
+  }
+
+  const boreOverride = input.boreOverride;
+  if (boreOverride && out.valveType.includes("Ball")) {
+    const cleanedSubtype = out.valveSubtype.replace(/\s+—\s+(Full Bore[^—]*|Reduced Bore[^—]*)$/i, "").trim();
+    const newSubtype = `${cleanedSubtype} — ${boreOverride} (User Override)`;
+    const overrideReason =
+      boreOverride === "Full Bore"
+        ? `User override to Full Bore. Engineering justification required (e.g., piggable, ESD/HIPPS, subsea, low-dP). Default cost-driven choice for ball valves is Reduced Bore.`
+        : `User override to Reduced Bore. Confirm no piggable, ESD/HIPPS, subsea or pressure-drop critical requirement applies.`;
+    out = {
+      ...out,
+      valveSubtype: newSubtype,
+      warnings: [`MANUAL OVERRIDE: Bore selection set to ${boreOverride} by user.`, ...out.warnings],
+      rationale: {
+        ...out.rationale,
+        bore: {
+          reason: overrideReason,
+          rule: `User override — bore set to ${boreOverride}. Engine default rule: ${out.rationale?.bore?.rule ?? "Reduced Bore default for ball valves."}`,
+          refs: out.rationale?.bore?.refs ?? ["API 6D §5.2"],
+        },
+      },
+    };
+  }
+  return out;
 }

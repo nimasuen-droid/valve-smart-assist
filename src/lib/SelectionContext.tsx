@@ -35,6 +35,9 @@ export interface SelectionInput {
   sizingK?: string;
   // Valve body size — defaults to line size (pipeSize) when undefined
   valveSize?: string;
+  // User overrides — empty/undefined means use engine recommendation
+  valveTypeOverride?: string;            // e.g. "Gate Valve" — must match an offered alternative or recommended
+  boreOverride?: "Full Bore" | "Reduced Bore" | "";  // ball valves only
 }
 
 const DEFAULT: SelectionInput = {
