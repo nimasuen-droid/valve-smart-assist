@@ -43,7 +43,8 @@ export const Route = createFileRoute("/report")({
 });
 
 function ReportPage() {
-  const { input, result, asmeWarning, asmeRec } = useSelectionResult();
+  const { input, result, asmeWarning, asmeRec, engineResult } = useSelectionResult();
+  const { update } = useSelection();
   const [previewOpen, setPreviewOpen] = useState(false);
 
   const datasheetHtml = useMemo(
