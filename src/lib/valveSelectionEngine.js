@@ -891,7 +891,7 @@ export function selectValve(input) {
       boreNote = "Full Bore (FB) mandatory — piggable line requires unobstructed internal diameter equal to pipe bore per pipeline pigging design requirements.";
       valveSubtype = valveSubtype + " — Full Bore (Piggable)";
       rationale.bore = {
-        reason: "Full bore ball valve is mandatory for piggable pipelines. Any reduction in internal diameter will obstruct the pig, preventing line cleaning or inspection. Full bore must match pipe ID throughout.",
+        reason: "Full bore ball valve is mandatory for piggable pipelines. Any reduction in internal diameter will obstruct the pig, preventing line cleaning or inspection. Full bore must match pipe ID throughout. This engineering requirement overrides the default cost-driven Reduced Bore preference.",
         rule: "Piggable lines: Full bore (FB) ball valve mandatory — pig must pass without obstruction. Reduced bore (RB) not permitted.",
         refs: ["API 6D §5.2", "API 6D"],
       };
@@ -899,24 +899,26 @@ export function selectValve(input) {
       boreNote = "Full bore recommended for subsea — interventions are costly, reduced bore increases pressure drop and may trap debris.";
       valveSubtype = valveSubtype + " — Full Bore (Subsea)";
       rationale.bore = {
-        reason: "Full bore specified for subsea service. Subsea valve maintenance or replacement is extremely costly. Full bore minimises pressure drop, reduces debris accumulation risk in the cavity, and allows future pigging without line modifications.",
+        reason: "Full bore specified for subsea service — engineering override of the default RB cost preference. Subsea valve maintenance or replacement is extremely costly. Full bore minimises pressure drop, reduces debris accumulation risk in the cavity, and allows future pigging without line modifications.",
         rule: "Subsea: Full bore preferred — maintenance access is expensive, full bore increases reliability and operational flexibility.",
         refs: ["API 6D §5.2", "API 6D"],
       };
     } else if (isESD || isHIPPS) {
       boreNote = "Full bore required for ESD/HIPPS — must achieve full flow isolation and fast stroking with minimum pressure loss on demand.";
       rationale.bore = {
-        reason: "ESD and HIPPS valves require full bore design to ensure the full-bore flow path is available for emergency depressurisation and to minimise pressure drop in the safety function path. Reduced bore ESD valves may not meet SIL-rated closure time requirements.",
+        reason: "ESD and HIPPS valves require full bore design — engineering override of the default RB cost preference. The full-bore flow path is needed for emergency depressurisation and to minimise pressure drop in the safety function path. Reduced bore ESD valves may not meet SIL-rated closure time requirements.",
         rule: "ESD/HIPPS: Full bore — minimises dP, ensures demanded safety function (fast full closure) meets SIL target. IEC 61511 SIL verification required.",
         refs: ["API 6D §5.2", "IEC 61511 (Functional Safety — Safety Instrumented Systems)", "API 6D"],
       };
       valveSubtype = valveSubtype + " — Full Bore (ESD)";
-    } else if (size >= 6) {
-      boreNote = "Reduced bore (RB) acceptable for isolation duty at this size — check pressure drop allowance. Full bore if pressure drop is critical.";
+    } else {
+      // DEFAULT: Reduced Bore for ball valves (cost driver)
+      boreNote = "Reduced Bore (RB) is the cost-optimised default for ball valves. RB is lighter, smaller, and significantly cheaper than full bore. Verify pressure drop is within allowable limits — switch to FB only if engineering requirement applies.";
+      valveSubtype = valveSubtype + " — Reduced Bore";
       rationale.bore = {
-        reason: "For larger ball valves in standard isolation service, reduced bore (RB) offers significant cost and weight savings. A one-size reduction in bore is typical (e.g., 8\" valve with 6\" bore). Verify pressure drop is within allowable limits. If pressure drop is critical or pigging is required, specify full bore.",
-        rule: "Standard isolation ≥ 6\": RB acceptable — verify pressure drop. Specify FB only where pigging, ESD, or low-dP requirements apply.",
-        refs: ["API 6D §5.2", "API 615 §6.2"],
+        reason: "Reduced Bore (RB) is the cost-driven default for ball valve isolation. RB valves are typically 20–40% cheaper, lighter, and shorter face-to-face than full bore equivalents. The bore is one nominal size smaller than the line (e.g., 6\" RB ball in an 8\" line). Full Bore is only specified when an engineering requirement overrides cost: piggable lines, ESD/HIPPS safety function, subsea intervention cost, or pressure-drop critical service.",
+        rule: "Ball valves: default Reduced Bore for cost. Override to Full Bore only on engineering requirement (piggable, ESD/HIPPS, subsea, dP-critical).",
+        refs: ["API 6D §5.2 (Bore classification)", "API 615 §6.2"],
       };
     }
   }
