@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown } from "lucide-react";
 import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
+import { useSelection } from "@/lib/SelectionContext";
 import { saveSelection } from "@/lib/selectionState";
 import { runSizing, evaluateAgainstValve } from "@/lib/sizing";
 import { toast } from "sonner";
