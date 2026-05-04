@@ -26,6 +26,7 @@ function useMobileSteps(currentStep: string) {
       { url: "/wizard/project", label: "Line Data" },
       { url: "/wizard/conditions", label: "Service Conditions" },
       { url: "/wizard/function", label: "Valve Function" },
+      { url: "/wizard/type", label: "Valve Type & Override" },
     ];
     if (isThrottling) steps.push({ url: "/wizard/sizing", label: "Sizing" });
     steps.push({ url: "/report", label: "Results" });
