@@ -16,10 +16,11 @@ export const Route = createFileRoute("/wizard/type")({
 });
 
 function TypeStep() {
-  const { result, engineResult } = useSelectionResult();
+  const { result, engineResult, asmeWarning, asmeRec } = useSelectionResult();
   const { input, update } = useSelection();
   const r = result.rationale.valveType;
   const isOverridden = !!input.valveTypeOverride && input.valveTypeOverride !== engineResult.valveType;
+  const classMismatch = !!asmeRec && asmeRec.recommendedClass !== input.pressureClass;
   const isBall = result.valveType.includes("Ball");
   const currentBore: "Full Bore" | "Reduced Bore" = input.boreOverride
     ? input.boreOverride
