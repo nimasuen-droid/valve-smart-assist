@@ -2,11 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { StepShell } from "@/components/StepShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
-import { ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
+import { ReferenceBubble, WhyCard, LearningMoment, WarningBanner } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { useSelection } from "@/lib/SelectionContext";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PRESSURE_CLASSES } from "@/lib/valveSelectionEngine";
 
 export const Route = createFileRoute("/wizard/type")({
   head: () => ({ meta: [{ title: "Valve Type Selection — Valve Selection Guide" }] }),
@@ -14,10 +16,11 @@ export const Route = createFileRoute("/wizard/type")({
 });
 
 function TypeStep() {
-  const { result, engineResult } = useSelectionResult();
+  const { result, engineResult, asmeWarning, asmeRec } = useSelectionResult();
   const { input, update } = useSelection();
   const r = result.rationale.valveType;
   const isOverridden = !!input.valveTypeOverride && input.valveTypeOverride !== engineResult.valveType;
+  const classMismatch = !!asmeRec && asmeRec.recommendedClass !== input.pressureClass;
   const isBall = result.valveType.includes("Ball");
   const currentBore: "Full Bore" | "Reduced Bore" = input.boreOverride
     ? input.boreOverride
@@ -74,6 +77,56 @@ function TypeStep() {
                 <span className="font-semibold text-foreground">Rule: </span>
                 {r.rule}
               </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ASME B16.5 P-T check + pressure class override */}
+      <Card className={asmeWarning || classMismatch ? "border-destructive/60 bg-destructive/5" : ""}>
+        <CardContent className="space-y-3 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              ASME B16.5 Pressure-Temperature Check
+            </Label>
+            {(asmeWarning || classMismatch) && (
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-destructive">
+                Action required
+              </span>
+            )}
+          </div>
+          {asmeWarning && (
+            <p className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+              {asmeWarning.warning}
+            </p>
+          )}
+          {!asmeWarning && classMismatch && asmeRec && (
+            <p className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm text-warning">
+              Selected class <strong>{input.pressureClass}</strong> differs from recommended{" "}
+              <strong>{asmeRec.recommendedClass}</strong> for {input.designPressure} barg @ {input.designTemp}°C.
+            </p>
+          )}
+          {!asmeWarning && !classMismatch && asmeRec && (
+            <p className="text-xs text-muted-foreground">{asmeRec.note}</p>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Override class:</span>
+            <Select value={input.pressureClass} onValueChange={(v) => update({ pressureClass: v })}>
+              <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {(PRESSURE_CLASSES as string[]).map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {asmeRec && asmeRec.recommendedClass !== input.pressureClass && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => update({ pressureClass: asmeRec.recommendedClass })}
+              >
+                Use recommended ({asmeRec.recommendedClass})
+              </Button>
             )}
           </div>
         </CardContent>
