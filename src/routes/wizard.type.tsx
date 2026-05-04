@@ -82,6 +82,56 @@ function TypeStep() {
         </CardContent>
       </Card>
 
+      {/* ASME B16.5 P-T check + pressure class override */}
+      <Card className={asmeWarning || classMismatch ? "border-destructive/60 bg-destructive/5" : ""}>
+        <CardContent className="space-y-3 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              ASME B16.5 Pressure-Temperature Check
+            </Label>
+            {(asmeWarning || classMismatch) && (
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-destructive">
+                Action required
+              </span>
+            )}
+          </div>
+          {asmeWarning && (
+            <p className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+              {asmeWarning.warning}
+            </p>
+          )}
+          {!asmeWarning && classMismatch && asmeRec && (
+            <p className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm text-warning">
+              Selected class <strong>{input.pressureClass}</strong> differs from recommended{" "}
+              <strong>{asmeRec.recommendedClass}</strong> for {input.designPressure} barg @ {input.designTemp}°C.
+            </p>
+          )}
+          {!asmeWarning && !classMismatch && asmeRec && (
+            <p className="text-xs text-muted-foreground">{asmeRec.note}</p>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted-foreground">Override class:</span>
+            <Select value={input.pressureClass} onValueChange={(v) => update({ pressureClass: v })}>
+              <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {(PRESSURE_CLASSES as string[]).map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {asmeRec && asmeRec.recommendedClass !== input.pressureClass && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => update({ pressureClass: asmeRec.recommendedClass })}
+              >
+                Use recommended ({asmeRec.recommendedClass})
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Bore override — ball valves only */}
       {isBall && (
         <Card>
