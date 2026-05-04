@@ -130,20 +130,22 @@ export function StepShell({ step, title, subtitle, children, aside }: StepShellP
           className="fixed bottom-16 left-0 right-0 z-30 border-t border-border bg-background/95 px-4 py-3 backdrop-blur"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
             {prev ? (
-              <Button asChild variant="outline" className="h-12 flex-1 text-base">
+              <Button asChild variant="outline" className="h-12 px-5 text-base">
                 <Link to={prev.url}>
                   <ArrowLeft className="h-4 w-4" /> Back
                 </Link>
               </Button>
             ) : (
-              <span className="flex-1" />
+              <span />
             )}
-            {next && (
-              <Button onClick={goNext} className="h-12 flex-1 text-base">
+            {next ? (
+              <Button onClick={goNext} className="h-12 px-5 text-base">
                 Next <ArrowRight className="h-4 w-4" />
               </Button>
+            ) : (
+              <span />
             )}
           </div>
         </div>
