@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ReferenceBubble, WarningBanner } from "@/components/InfoCards";
+import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { SERVICE_TYPES, FLUID_TYPES, INSTALLATION_LOCATIONS } from "@/lib/valveSelectionEngine";
+import { recommendPressureClass, checkAsmeB165Rating } from "@/lib/asmeB165Ratings";
 
 export const Route = createFileRoute("/wizard/conditions")({
   head: () => ({ meta: [{ title: "Service Conditions — Valve Selection Guide" }] }),
@@ -17,6 +18,12 @@ export const Route = createFileRoute("/wizard/conditions")({
 function ConditionsStep() {
   const { input, update } = useSelection();
   const u = (patch: Partial<typeof input>) => update({ ...patch, isSample: false, sampleTitle: undefined });
+  const asmeRec = recommendPressureClass({ designTemp: input.designTemp, designPressure: input.designPressure });
+  const asmeWarn = checkAsmeB165Rating({
+    pressureClass: input.pressureClass,
+    designTemp: input.designTemp,
+    designPressure: input.designPressure,
+  });
   return (
     <StepShell
       step="/wizard/conditions"
@@ -26,8 +33,28 @@ function ConditionsStep() {
         <>
           <WarningBanner title="Use design, not operating">
             Always rate the valve at design pressure and the more severe of design or upset temperature.
-            ASME B16.5 ratings are validated automatically when you reach the End Connection step.
           </WarningBanner>
+          {asmeWarn && (
+            <WarningBanner title={asmeWarn.type === "caution" ? "ASME B16.5 caution" : "ASME B16.5 rating exceeded"}>
+              {asmeWarn.warning}
+              {asmeRec && asmeRec.recommendedClass !== input.pressureClass && (
+                <span className="mt-2 block">
+                  Recommended minimum class for {input.designPressure} barg @ {input.designTemp}°C: <strong>{asmeRec.recommendedClass}</strong>.
+                </span>
+              )}
+            </WarningBanner>
+          )}
+          {!asmeWarn && asmeRec && (
+            <WhyCard>
+              <strong className="text-foreground">ASME B16.5 check: </strong>
+              {asmeRec.note}
+              {asmeRec.recommendedClass !== input.pressureClass && (
+                <span className="mt-1 block text-warning">
+                  Current selected class {input.pressureClass} differs from recommended {asmeRec.recommendedClass}.
+                </span>
+              )}
+            </WhyCard>
+          )}
           <ReferenceBubble standard="ASME B16.5" note="Pressure-temperature ratings for flanges and flanged valves." />
           <ReferenceBubble standard="ASME B16.34" note="P-T ratings for flanged, threaded & welded valves." />
         </>
