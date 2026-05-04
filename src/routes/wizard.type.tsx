@@ -83,30 +83,40 @@ function TypeStep() {
       </Card>
 
       {/* ASME B16.5 P-T check + pressure class override */}
-      <Card className={asmeWarning || classMismatch ? "border-destructive/60 bg-destructive/5" : ""}>
+      {(() => {
+        const isCritical = !!asmeWarning && (asmeWarning.type === "pressure" || asmeWarning.type === "material");
+        const isCaution = !!asmeWarning && asmeWarning.type === "caution";
+        const showRed = isCritical || classMismatch;
+        return (
+      <Card className={showRed ? "border-destructive/60 bg-destructive/5" : ""}>
         <CardContent className="space-y-3 p-4">
           <div className="flex items-center justify-between gap-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               ASME B16.5 Pressure-Temperature Check
             </Label>
-            {(asmeWarning || classMismatch) && (
+            {showRed && (
               <span className="text-[11px] font-semibold uppercase tracking-wider text-destructive">
                 Action required
               </span>
             )}
           </div>
-          {asmeWarning && (
+          {isCritical && (
             <p className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-              {asmeWarning.warning}
+              {asmeWarning!.warning}
             </p>
           )}
-          {!asmeWarning && classMismatch && asmeRec && (
+          {!isCritical && classMismatch && asmeRec && (
             <p className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm text-warning">
               Selected class <strong>{input.pressureClass}</strong> differs from recommended{" "}
               <strong>{asmeRec.recommendedClass}</strong> for {input.designPressure} barg @ {input.designTemp}°C.
             </p>
           )}
-          {!asmeWarning && !classMismatch && asmeRec && (
+          {!isCritical && !classMismatch && isCaution && (
+            <p className="rounded-md border border-warning/40 bg-warning/5 p-3 text-xs text-warning">
+              {asmeWarning!.warning}
+            </p>
+          )}
+          {!isCritical && !classMismatch && !isCaution && asmeRec && (
             <p className="text-xs text-muted-foreground">{asmeRec.note}</p>
           )}
           <div className="flex flex-wrap items-center gap-2">
