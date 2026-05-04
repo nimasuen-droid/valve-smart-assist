@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ReferenceBubble, WarningBanner } from "@/components/InfoCards";
+import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { SERVICE_TYPES, FLUID_TYPES, INSTALLATION_LOCATIONS } from "@/lib/valveSelectionEngine";
+import { recommendPressureClass, checkAsmeB165Rating } from "@/lib/asmeB165Ratings";
 
 export const Route = createFileRoute("/wizard/conditions")({
   head: () => ({ meta: [{ title: "Service Conditions — Valve Selection Guide" }] }),
