@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
+import { PRESSURE_CLASSES, PIPE_SIZES } from "@/lib/valveSelectionEngine";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { useSelection } from "@/lib/SelectionContext";
 import { saveSelection } from "@/lib/selectionState";
@@ -134,7 +136,7 @@ function ReportPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link to="/wizard/special"><ArrowLeft className="h-4 w-4" /> Inputs</Link>
+            <Link to="/wizard/project"><ArrowLeft className="h-4 w-4" /> Inputs</Link>
           </Button>
           <Button variant="outline" size="sm" onClick={onSave}>
             <Save className="h-4 w-4" /> Save
@@ -186,6 +188,33 @@ function ReportPage() {
             title="Selected valve specification"
             badge={<Badge className="border-success/40 bg-success/10 text-success" variant="outline">Recommended</Badge>}
           >
+            <div className="mb-4 grid gap-3 sm:grid-cols-2">
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Pressure class (override)</p>
+                <Select value={input.pressureClass} onValueChange={(v) => update({ pressureClass: v })}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {(PRESSURE_CLASSES as string[]).map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {asmeRec && asmeRec.recommendedClass !== input.pressureClass && (
+                  <p className="mt-1 text-[11px] text-warning">Recommended: {asmeRec.recommendedClass}</p>
+                )}
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Pipe size (override)</p>
+                <Select value={input.pipeSize} onValueChange={(v) => update({ pipeSize: v })}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {(PIPE_SIZES as string[]).map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             <dl className="divide-y divide-border">
               {spec.map(([k, v]) => (
                 <div key={k} className="flex items-baseline justify-between gap-4 py-2.5">
