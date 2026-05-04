@@ -134,7 +134,7 @@ function ReportPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link to="/wizard/special"><ArrowLeft className="h-4 w-4" /> Inputs</Link>
+            <Link to="/wizard/project"><ArrowLeft className="h-4 w-4" /> Inputs</Link>
           </Button>
           <Button variant="outline" size="sm" onClick={onSave}>
             <Save className="h-4 w-4" /> Save
