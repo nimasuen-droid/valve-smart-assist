@@ -2,11 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { StepShell } from "@/components/StepShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
-import { ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
+import { ReferenceBubble, WhyCard, LearningMoment, WarningBanner } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { useSelection } from "@/lib/SelectionContext";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PRESSURE_CLASSES } from "@/lib/valveSelectionEngine";
 
 export const Route = createFileRoute("/wizard/type")({
   head: () => ({ meta: [{ title: "Valve Type Selection — Valve Selection Guide" }] }),
