@@ -141,6 +141,8 @@ function TypeStep() {
           </div>
         </CardContent>
       </Card>
+        );
+      })()}
 
       {/* Bore override — ball valves only */}
       {isBall && (
