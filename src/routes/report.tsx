@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown } from "lucide-react";
+import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown, Star, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { PRESSURE_CLASSES, PIPE_SIZES } from "@/lib/valveSelectionEngine";
