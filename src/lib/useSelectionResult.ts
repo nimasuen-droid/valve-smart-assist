@@ -81,6 +81,13 @@ export function useSelectionResult() {
 type SelectionInputLite = {
   valveTypeOverride?: string;
   boreOverride?: "Full Bore" | "Reduced Bore" | "";
+  bodyMaterialOverride?: string;
+  bodyMaterialSpecOverride?: string;
+  seatMaterialOverride?: string;
+  discBallMaterialOverride?: string;
+  stemMaterialOverride?: string;
+  gasketOverride?: string;
+  packingOverride?: string;
 };
 
 function applyOverrides(res: SelectionResult, input: SelectionInputLite): SelectionResult {
@@ -131,6 +138,27 @@ function applyOverrides(res: SelectionResult, input: SelectionInputLite): Select
         },
       },
     };
+  }
+
+  const matFields: Array<[keyof SelectionInputLite, keyof SelectionResult, string]> = [
+    ["bodyMaterialOverride", "bodyMaterial", "Body material"],
+    ["bodyMaterialSpecOverride", "bodyMaterialSpec", "Body material specification"],
+    ["seatMaterialOverride", "seatMaterial", "Seat material"],
+    ["discBallMaterialOverride", "discBallMaterial", "Disc/Ball material"],
+    ["stemMaterialOverride", "stemMaterial", "Stem material"],
+    ["gasketOverride", "gasket", "Gasket"],
+    ["packingOverride", "packing", "Packing"],
+  ];
+  for (const [inputKey, resultKey, label] of matFields) {
+    const v = (input as Record<string, unknown>)[inputKey as string];
+    if (typeof v === "string" && v.trim() && v !== (out as unknown as Record<string, string>)[resultKey as string]) {
+      const original = (out as unknown as Record<string, string>)[resultKey as string];
+      out = {
+        ...out,
+        [resultKey]: v,
+        warnings: [`MANUAL OVERRIDE: ${label} changed from "${original}" to "${v}". Engineering review required.`, ...out.warnings],
+      } as SelectionResult;
+    }
   }
   return out;
 }
