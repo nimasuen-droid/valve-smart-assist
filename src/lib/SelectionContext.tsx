@@ -46,6 +46,8 @@ export interface SelectionInput {
   stemMaterialOverride?: string;
   gasketOverride?: string;
   packingOverride?: string;
+  endConnectionOverride?: string;
+  operatorOverride?: string;
 }
 
 const DEFAULT: SelectionInput = {
