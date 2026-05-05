@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { StepShell } from "@/components/StepShell";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
-import { ReferenceBubble, WhyCard, LearningMoment, WarningBanner } from "@/components/InfoCards";
+import { CheckCircle2, XCircle, AlertTriangle, Star, Unlock, Lock } from "lucide-react";
+import { ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { useSelection } from "@/lib/SelectionContext";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PRESSURE_CLASSES } from "@/lib/valveSelectionEngine";
 
