@@ -488,17 +488,17 @@ function ReportPage() {
         <Button variant="outline" size="sm" onClick={onSave}>
           <Save className="h-4 w-4" /> Save
         </Button>
+        <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
+          <Eye className="h-4 w-4" /> View Datasheet
+        </Button>
         <Button variant="outline" size="sm" onClick={downloadHtml}>
           <Download className="h-4 w-4" /> Download HTML
         </Button>
         <Button variant="outline" size="sm" onClick={exportExcel}>
           <FileSpreadsheet className="h-4 w-4" /> Export Excel
         </Button>
-        <Button variant="outline" size="sm" onClick={exportPdf}>
+        <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={exportPdf}>
           <Printer className="h-4 w-4" /> Export PDF
-        </Button>
-        <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={() => setPreviewOpen(true)}>
-          <Eye className="h-4 w-4" /> View Datasheet
         </Button>
       </div>
 
