@@ -88,6 +88,8 @@ type SelectionInputLite = {
   stemMaterialOverride?: string;
   gasketOverride?: string;
   packingOverride?: string;
+  endConnectionOverride?: string;
+  operatorOverride?: string;
 };
 
 function applyOverrides(res: SelectionResult, input: SelectionInputLite): SelectionResult {
