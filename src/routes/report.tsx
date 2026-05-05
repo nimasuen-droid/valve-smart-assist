@@ -385,19 +385,22 @@ function ReportPage() {
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-2 border-t pt-6">
-        <Button variant="outline" onClick={onSave}>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/wizard/project"><ArrowLeft className="h-4 w-4" /> Inputs</Link>
+        </Button>
+        <Button variant="outline" size="sm" onClick={onSave}>
           <Save className="h-4 w-4" /> Save
         </Button>
-        <Button variant="outline" onClick={downloadHtml}>
+        <Button variant="outline" size="sm" onClick={downloadHtml}>
           <Download className="h-4 w-4" /> Download HTML
         </Button>
-        <Button variant="outline" onClick={exportExcel}>
+        <Button variant="outline" size="sm" onClick={exportExcel}>
           <FileSpreadsheet className="h-4 w-4" /> Export Excel
         </Button>
-        <Button variant="outline" onClick={exportPdf}>
+        <Button variant="outline" size="sm" onClick={exportPdf}>
           <Printer className="h-4 w-4" /> Export PDF
         </Button>
-        <Button className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={() => setPreviewOpen(true)}>
+        <Button size="sm" className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={() => setPreviewOpen(true)}>
           <Eye className="h-4 w-4" /> View Datasheet
         </Button>
       </div>
