@@ -30,6 +30,16 @@ function TypeStep() {
       ? "Full Bore"
       : "Reduced Bore";
 
+  const [typeUnlocked, setTypeUnlocked] = useState<boolean>(isOverridden);
+  const [classUnlocked, setClassUnlocked] = useState<boolean>(classMismatch);
+  const [boreUnlocked, setBoreUnlocked] = useState<boolean>(!!input.boreOverride);
+  const reasons = input.overrideReasons ?? {};
+  const typeReason = reasons.valveTypeOverride ?? "";
+  const classReason = reasons.pressureClass ?? "";
+  const boreReason = reasons.boreOverride ?? "";
+  const setReason = (key: string, v: string) =>
+    update({ overrideReasons: { ...reasons, [key]: v } });
+
   const selectType = (t: string) => {
     if (t === engineResult.valveType) update({ valveTypeOverride: "" });
     else update({ valveTypeOverride: t });
