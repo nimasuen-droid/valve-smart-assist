@@ -133,17 +133,21 @@ function EndsStep() {
 
       <Card>
         <CardContent className="space-y-4 p-5">
-          <OverrideDropdown
+          <OverrideField
             label="End Connection"
             recommended={engineResult.endConnection}
             overrideKey="endConnectionOverride"
             options={END_CONNECTION_OPTIONS}
+            reasoning={result.rationale.endConnection?.reason || "Selected to match pipe size, pressure class and service per ASME B16.5."}
+            warning="Verify flange facing/end style matches piping spec and gasket selection."
           />
-          <OverrideDropdown
+          <OverrideField
             label="Operator"
             recommended={engineResult.operator}
             overrideKey="operatorOverride"
             options={OPERATOR_OPTIONS}
+            reasoning={result.rationale.operator?.reason || "Operator type chosen for valve size, torque and operating philosophy."}
+            warning="Confirm torque rating, fail-safe action and SIL/ESD requirement against project spec."
           />
         </CardContent>
       </Card>
