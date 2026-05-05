@@ -81,6 +81,13 @@ export function useSelectionResult() {
 type SelectionInputLite = {
   valveTypeOverride?: string;
   boreOverride?: "Full Bore" | "Reduced Bore" | "";
+  bodyMaterialOverride?: string;
+  bodyMaterialSpecOverride?: string;
+  seatMaterialOverride?: string;
+  discBallMaterialOverride?: string;
+  stemMaterialOverride?: string;
+  gasketOverride?: string;
+  packingOverride?: string;
 };
 
 function applyOverrides(res: SelectionResult, input: SelectionInputLite): SelectionResult {
