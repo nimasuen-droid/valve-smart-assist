@@ -150,6 +150,8 @@ function applyOverrides(res: SelectionResult, input: SelectionInputLite): Select
     ["stemMaterialOverride", "stemMaterial", "Stem material"],
     ["gasketOverride", "gasket", "Gasket"],
     ["packingOverride", "packing", "Packing"],
+    ["endConnectionOverride", "endConnection", "End connection"],
+    ["operatorOverride", "operator", "Operator"],
   ];
   for (const [inputKey, resultKey, label] of matFields) {
     const v = (input as Record<string, unknown>)[inputKey as string];
