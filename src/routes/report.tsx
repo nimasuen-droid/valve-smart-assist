@@ -236,7 +236,7 @@ function ReportPage() {
           <Button variant="outline" size="sm" onClick={onSave}>
             <Save className="h-4 w-4" /> Save
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
+          <Button size="sm" onClick={() => setPreviewOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow">
             <Eye className="h-4 w-4" /> View Datasheet
           </Button>
           <Button variant="outline" size="sm" onClick={downloadHtml}>
