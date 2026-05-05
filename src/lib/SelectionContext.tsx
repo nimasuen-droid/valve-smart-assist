@@ -38,6 +38,14 @@ export interface SelectionInput {
   // User overrides — empty/undefined means use engine recommendation
   valveTypeOverride?: string;            // e.g. "Gate Valve" — must match an offered alternative or recommended
   boreOverride?: "Full Bore" | "Reduced Bore" | "";  // ball valves only
+  // Material overrides — empty/undefined means use engine recommendation
+  bodyMaterialOverride?: string;
+  bodyMaterialSpecOverride?: string;
+  seatMaterialOverride?: string;
+  discBallMaterialOverride?: string;
+  stemMaterialOverride?: string;
+  gasketOverride?: string;
+  packingOverride?: string;
 }
 
 const DEFAULT: SelectionInput = {
