@@ -225,6 +225,8 @@ function ReportPage() {
             </dl>
           </MSection>
 
+          <OverridesSummary input={input} engineResult={engineResult} result={result} />
+
           {sizing && (
             <MSection
               icon={<Gauge className="h-5 w-5 text-primary" />}
