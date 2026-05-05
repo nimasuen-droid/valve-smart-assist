@@ -113,53 +113,97 @@ function TypeStep() {
         <CardContent className="space-y-3 p-4">
           <div className="flex items-center justify-between gap-2">
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              ASME B16.5 Pressure-Temperature Check
+              ASME B16.5 Pressure Class
             </Label>
-            {showRed && (
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-destructive">
-                Action required
+            {classMismatch ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-warning">
+                <AlertTriangle className="h-3 w-3" /> Override active
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-success">
+                <Star className="h-3 w-3 fill-success text-success" /> Recommended
               </span>
             )}
           </div>
+
+          {asmeRec && (
+            <div className="rounded-md border border-success/30 bg-success/5 p-2.5">
+              <div className="flex items-center gap-2">
+                <Star className="h-3.5 w-3.5 shrink-0 fill-success text-success" />
+                <span className="font-mono text-sm font-medium text-success">{asmeRec.recommendedClass}</span>
+                <span className="ml-auto text-[10px] uppercase tracking-wider text-success/70">Recommended</span>
+              </div>
+              <p className="mt-1 pl-5 text-[11px] text-muted-foreground">Based on input conditions and engineering logic — {asmeRec.note}</p>
+            </div>
+          )}
+
           {isCritical && (
             <p className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
               {asmeWarning!.warning}
             </p>
           )}
-          {!isCritical && classMismatch && asmeRec && (
-            <p className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm text-warning">
-              Selected class <strong>{input.pressureClass}</strong> differs from recommended{" "}
-              <strong>{asmeRec.recommendedClass}</strong> for {input.designPressure} barg @ {input.designTemp}°C.
-            </p>
-          )}
-          {!isCritical && !classMismatch && isCaution && (
+          {!isCritical && isCaution && (
             <p className="rounded-md border border-warning/40 bg-warning/5 p-3 text-xs text-warning">
               {asmeWarning!.warning}
             </p>
           )}
-          {!isCritical && !classMismatch && !isCaution && asmeRec && (
-            <p className="text-xs text-muted-foreground">{asmeRec.note}</p>
+
+          {!classUnlocked && !classMismatch ? (
+            <button
+              type="button"
+              onClick={() => setClassUnlocked(true)}
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline"
+            >
+              <Unlock className="h-3 w-3" /> Override recommendation
+            </button>
+          ) : (
+            <div className="space-y-2 rounded-md border border-warning/30 bg-warning/5 p-3">
+              <p className="text-[11px] text-warning">
+                Manual override should be based on project specification, applicable codes, service conditions, or engineering judgment.
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">Class:</span>
+                <Select value={input.pressureClass} onValueChange={(v) => update({ pressureClass: v })}>
+                  <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {(PRESSURE_CLASSES as string[]).map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {asmeRec && c === asmeRec.recommendedClass ? `★ ${c} (recommended)` : c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {classMismatch && asmeRec && (
+                <p className="text-xs">
+                  <span className="text-muted-foreground">Selected: </span>
+                  <span className="font-mono font-medium text-warning">{input.pressureClass}</span>
+                  <span className="ml-1 text-[10px] uppercase tracking-wider text-warning/80">(Override)</span>
+                </p>
+              )}
+              <div>
+                <label className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Override reason {classMismatch && <span className="text-destructive">*</span>}
+                </label>
+                <Textarea
+                  value={classReason}
+                  onChange={(e) => setReason("pressureClass", e.target.value)}
+                  placeholder="e.g. Client spec, line class, vendor standardisation"
+                  className="min-h-[60px] text-xs"
+                />
+                {classMismatch && !classReason.trim() && (
+                  <p className="mt-1 text-[11px] text-destructive">A justification is required for traceability.</p>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-1">
+                {asmeRec && classMismatch && (
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { update({ pressureClass: asmeRec.recommendedClass }); setReason("pressureClass", ""); setClassUnlocked(false); }}>
+                    <Lock className="h-3 w-3" /> Use recommended
+                  </Button>
+                )}
+              </div>
+            </div>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-muted-foreground">Override class:</span>
-            <Select value={input.pressureClass} onValueChange={(v) => update({ pressureClass: v })}>
-              <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {(PRESSURE_CLASSES as string[]).map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {asmeRec && asmeRec.recommendedClass !== input.pressureClass && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => update({ pressureClass: asmeRec.recommendedClass })}
-              >
-                Use recommended ({asmeRec.recommendedClass})
-              </Button>
-            )}
-          </div>
         </CardContent>
       </Card>
         );
@@ -168,34 +212,85 @@ function TypeStep() {
       {/* Bore override — ball valves only */}
       {isBall && (
         <Card>
-          <CardContent className="space-y-2 p-4">
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Bore Selection
-            </Label>
-            <div className="flex flex-wrap gap-2">
-              {(["Reduced Bore", "Full Bore"] as const).map((b) => (
-                <Button
-                  key={b}
-                  size="sm"
-                  variant={currentBore === b ? "default" : "outline"}
-                  onClick={() => update({ boreOverride: b })}
-                >
-                  {b}
-                  {b === "Reduced Bore" && (
-                    <span className="ml-1 text-[10px] opacity-70">(default — cost)</span>
-                  )}
-                </Button>
-              ))}
-              {input.boreOverride && (
-                <Button size="sm" variant="ghost" onClick={() => update({ boreOverride: "" })}>
-                  Clear override
-                </Button>
+          <CardContent className="space-y-3 p-4">
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Bore Selection
+              </Label>
+              {input.boreOverride ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-warning">
+                  <AlertTriangle className="h-3 w-3" /> Override active
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-success">
+                  <Star className="h-3 w-3 fill-success text-success" /> Recommended
+                </span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Reduced Bore is the cost-optimised default. Switch to Full Bore only when piggable, ESD/HIPPS,
-              subsea, or pressure-drop requirements apply.
-            </p>
+            <div className="rounded-md border border-success/30 bg-success/5 p-2.5">
+              <div className="flex items-center gap-2">
+                <Star className="h-3.5 w-3.5 shrink-0 fill-success text-success" />
+                <span className="font-mono text-sm font-medium text-success">Reduced Bore</span>
+                <span className="ml-auto text-[10px] uppercase tracking-wider text-success/70">Recommended</span>
+              </div>
+              <p className="mt-1 pl-5 text-[11px] text-muted-foreground">
+                Based on input conditions and engineering logic — cost-optimised default for ball valves.
+              </p>
+            </div>
+
+            {!boreUnlocked && !input.boreOverride ? (
+              <button
+                type="button"
+                onClick={() => setBoreUnlocked(true)}
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline"
+              >
+                <Unlock className="h-3 w-3" /> Override recommendation
+              </button>
+            ) : (
+              <div className="space-y-2 rounded-md border border-warning/30 bg-warning/5 p-3">
+                <p className="text-[11px] text-warning">
+                  Switch to Full Bore only when piggable, ESD/HIPPS, subsea, or pressure-drop requirements apply.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(["Reduced Bore", "Full Bore"] as const).map((b) => (
+                    <Button
+                      key={b}
+                      size="sm"
+                      variant={currentBore === b ? "default" : "outline"}
+                      onClick={() => update({ boreOverride: b })}
+                    >
+                      {b === "Reduced Bore" ? `★ ${b}` : b}
+                    </Button>
+                  ))}
+                </div>
+                {input.boreOverride && (
+                  <p className="text-xs">
+                    <span className="text-muted-foreground">Selected: </span>
+                    <span className="font-mono font-medium text-warning">{input.boreOverride}</span>
+                    <span className="ml-1 text-[10px] uppercase tracking-wider text-warning/80">(Override)</span>
+                  </p>
+                )}
+                <div>
+                  <label className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    Override reason {input.boreOverride && <span className="text-destructive">*</span>}
+                  </label>
+                  <Textarea
+                    value={boreReason}
+                    onChange={(e) => setReason("boreOverride", e.target.value)}
+                    placeholder="e.g. Pigging required, ESD/HIPPS, subsea tie-in, pressure-drop critical"
+                    className="min-h-[60px] text-xs"
+                  />
+                  {input.boreOverride && !boreReason.trim() && (
+                    <p className="mt-1 text-[11px] text-destructive">A justification is required for traceability.</p>
+                  )}
+                </div>
+                <div className="flex items-center justify-end pt-1">
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { update({ boreOverride: "" }); setReason("boreOverride", ""); setBoreUnlocked(false); }}>
+                    <Lock className="h-3 w-3" /> Use recommended
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
