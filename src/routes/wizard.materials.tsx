@@ -1,25 +1,81 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { StepShell } from "@/components/StepShell";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
+import { useSelection, type SelectionInput } from "@/lib/SelectionContext";
 
 export const Route = createFileRoute("/wizard/materials")({
   head: () => ({ meta: [{ title: "Body / Trim / Seat — Valve Selection Guide" }] }),
   component: MaterialsStep,
 });
 
-function Row({ label, value }: { label: string; value: string }) {
+type OverrideKey =
+  | "bodyMaterialOverride"
+  | "bodyMaterialSpecOverride"
+  | "seatMaterialOverride"
+  | "discBallMaterialOverride"
+  | "stemMaterialOverride"
+  | "gasketOverride"
+  | "packingOverride";
+
+function OverrideRow({
+  label,
+  recommended,
+  overrideKey,
+}: {
+  label: string;
+  recommended: string;
+  overrideKey: OverrideKey;
+}) {
+  const { input, update } = useSelection();
+  const current = (input[overrideKey] as string | undefined) ?? "";
+  const isOverridden = !!current && current !== recommended;
   return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-border py-2.5 last:border-0">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-right text-sm font-medium font-mono">{value || "—"}</dd>
+    <div className="border-b border-border py-3 last:border-0">
+      <div className="flex items-baseline justify-between gap-4">
+        <dt className="text-sm text-muted-foreground">{label}</dt>
+        <dd className="text-right text-sm font-medium font-mono">
+          {isOverridden ? (
+            <span className="text-warning">{current}</span>
+          ) : (
+            recommended || "—"
+          )}
+        </dd>
+      </div>
+      <div className="mt-2 flex items-center gap-2">
+        <Input
+          value={current}
+          placeholder={`Override (recommended: ${recommended || "—"})`}
+          onChange={(e) =>
+            update({ [overrideKey]: e.target.value } as Partial<SelectionInput>)
+          }
+          className="h-8 text-xs"
+        />
+        {isOverridden && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 px-2 text-xs"
+            onClick={() => update({ [overrideKey]: "" } as Partial<SelectionInput>)}
+          >
+            Reset
+          </Button>
+        )}
+      </div>
+      {isOverridden && (
+        <p className="mt-1 text-[11px] text-warning">
+          Manual override — engineering review required.
+        </p>
+      )}
     </div>
   );
 }
 
 function MaterialsStep() {
-  const { result } = useSelectionResult();
+  const { result, engineResult } = useSelectionResult();
   const refs = [
     ...(result.rationale.bodyMaterial?.refs || []),
     ...(result.rationale.trim?.refs || []),
@@ -28,7 +84,7 @@ function MaterialsStep() {
     <StepShell
       step="/wizard/materials"
       title="Body, Trim & Seat Materials"
-      subtitle="Materials derived from your service type, temperature and pressure class per ASME B16.34 and API 615."
+      subtitle="Materials derived from your service type, temperature and pressure class per ASME B16.34 and API 615. Override any value below if your project specification requires it."
       aside={
         <>
           {result.rationale.bodyMaterial && (
@@ -65,8 +121,8 @@ function MaterialsStep() {
         <CardContent className="p-5">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Body</p>
           <dl>
-            <Row label="Body material" value={result.bodyMaterial} />
-            <Row label="Body material specification" value={result.bodyMaterialSpec} />
+            <OverrideRow label="Body material" recommended={engineResult.bodyMaterial} overrideKey="bodyMaterialOverride" />
+            <OverrideRow label="Body material specification" recommended={engineResult.bodyMaterialSpec} overrideKey="bodyMaterialSpecOverride" />
           </dl>
         </CardContent>
       </Card>
@@ -74,9 +130,9 @@ function MaterialsStep() {
         <CardContent className="p-5">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trim</p>
           <dl>
-            <Row label="Seat material" value={result.seatMaterial} />
-            <Row label="Disc / Ball material" value={result.discBallMaterial} />
-            <Row label="Stem material" value={result.stemMaterial} />
+            <OverrideRow label="Seat material" recommended={engineResult.seatMaterial} overrideKey="seatMaterialOverride" />
+            <OverrideRow label="Disc / Ball material" recommended={engineResult.discBallMaterial} overrideKey="discBallMaterialOverride" />
+            <OverrideRow label="Stem material" recommended={engineResult.stemMaterial} overrideKey="stemMaterialOverride" />
           </dl>
         </CardContent>
       </Card>
@@ -84,8 +140,8 @@ function MaterialsStep() {
         <CardContent className="p-5">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sealing</p>
           <dl>
-            <Row label="Gasket" value={result.gasket} />
-            <Row label="Packing" value={result.packing} />
+            <OverrideRow label="Gasket" recommended={engineResult.gasket} overrideKey="gasketOverride" />
+            <OverrideRow label="Packing" recommended={engineResult.packing} overrideKey="packingOverride" />
           </dl>
         </CardContent>
       </Card>
