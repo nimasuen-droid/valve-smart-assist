@@ -48,6 +48,8 @@ export interface SelectionInput {
   packingOverride?: string;
   endConnectionOverride?: string;
   operatorOverride?: string;
+  // Free-text reasons keyed by the override field name (e.g. "bodyMaterialOverride")
+  overrideReasons?: Record<string, string>;
 }
 
 const DEFAULT: SelectionInput = {

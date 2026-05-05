@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown } from "lucide-react";
+import { Download, FileText, Printer, ArrowLeft, CheckCircle2, AlertCircle, Save, Eye, FileSpreadsheet, Gauge, ChevronDown, Star, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { PRESSURE_CLASSES, PIPE_SIZES } from "@/lib/valveSelectionEngine";
@@ -31,6 +31,101 @@ function MSection({ title, icon, badge, defaultOpen = true, children }: { title:
       </CardHeader>
       <CardContent className={`${open ? "block" : "hidden"} md:block`}>{children}</CardContent>
     </Card>
+  );
+}
+
+type OverrideSpec = {
+  key: string;
+  label: string;
+  recommended: string;
+  selected: string;
+  inputKey: string;
+};
+
+function OverridesSummary({
+  input,
+  engineResult,
+  result,
+}: {
+  input: ReturnType<typeof useSelection>["input"];
+  engineResult: ReturnType<typeof useSelectionResult>["engineResult"];
+  result: ReturnType<typeof useSelectionResult>["result"];
+}) {
+  const reasons = input.overrideReasons ?? {};
+  const fields: OverrideSpec[] = [
+    { key: "valveType", label: "Valve type", recommended: engineResult.valveType, selected: result.valveType, inputKey: "valveTypeOverride" },
+    { key: "pressureClass", label: "Pressure class", recommended: input.pressureClass, selected: input.pressureClass, inputKey: "pressureClass" },
+    { key: "boreOverride", label: "Bore", recommended: "Reduced Bore", selected: input.boreOverride || "Reduced Bore", inputKey: "boreOverride" },
+    { key: "bodyMaterial", label: "Body material", recommended: engineResult.bodyMaterial, selected: result.bodyMaterial, inputKey: "bodyMaterialOverride" },
+    { key: "bodyMaterialSpec", label: "Body material spec", recommended: engineResult.bodyMaterialSpec, selected: result.bodyMaterialSpec, inputKey: "bodyMaterialSpecOverride" },
+    { key: "seatMaterial", label: "Seat material", recommended: engineResult.seatMaterial, selected: result.seatMaterial, inputKey: "seatMaterialOverride" },
+    { key: "discBallMaterial", label: "Disc / Ball material", recommended: engineResult.discBallMaterial, selected: result.discBallMaterial, inputKey: "discBallMaterialOverride" },
+    { key: "stemMaterial", label: "Stem material", recommended: engineResult.stemMaterial, selected: result.stemMaterial, inputKey: "stemMaterialOverride" },
+    { key: "gasket", label: "Gasket", recommended: engineResult.gasket, selected: result.gasket, inputKey: "gasketOverride" },
+    { key: "packing", label: "Packing", recommended: engineResult.packing, selected: result.packing, inputKey: "packingOverride" },
+    { key: "endConnection", label: "End connection", recommended: engineResult.endConnection, selected: result.endConnection, inputKey: "endConnectionOverride" },
+    { key: "operator", label: "Operator", recommended: engineResult.operator, selected: result.operator, inputKey: "operatorOverride" },
+  ];
+
+  const overridden = fields.filter((f) => f.selected && f.recommended && f.selected !== f.recommended);
+
+  return (
+    <MSection
+      icon={overridden.length ? <AlertTriangle className="h-5 w-5 text-warning" /> : <Star className="h-5 w-5 fill-success text-success" />}
+      title="Overrides summary"
+      badge={
+        overridden.length ? (
+          <Badge variant="outline" className="border-warning/40 bg-warning/10 text-warning">
+            {overridden.length} override{overridden.length > 1 ? "s" : ""}
+          </Badge>
+        ) : (
+          <Badge variant="outline" className="border-success/40 bg-success/10 text-success">All recommended</Badge>
+        )
+      }
+      defaultOpen={overridden.length > 0}
+    >
+      {overridden.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No engineering recommendations have been overridden. The selected specification matches the engine output.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {overridden.map((f) => {
+            const reason = reasons[f.inputKey]?.trim();
+            return (
+              <div key={f.key} className="rounded-md border border-warning/30 bg-warning/5 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-warning">{f.label}</p>
+                <dl className="mt-1 grid gap-1 text-xs sm:grid-cols-2">
+                  <div className="flex items-baseline gap-2">
+                    <dt className="text-muted-foreground">Recommended:</dt>
+                    <dd className="font-mono text-success">★ {f.recommended}</dd>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <dt className="text-muted-foreground">Selected:</dt>
+                    <dd className="font-mono text-warning">{f.selected}</dd>
+                  </div>
+                </dl>
+                <p className="mt-1 text-xs">
+                  <span className="text-muted-foreground">Override status: </span>
+                  <span className="font-medium text-warning">Yes</span>
+                </p>
+                <p className="mt-1 text-xs">
+                  <span className="text-muted-foreground">Override reason: </span>
+                  {reason ? (
+                    <span className="text-foreground">{reason}</span>
+                  ) : (
+                    <span className="text-destructive">Not provided — required for traceability.</span>
+                  )}
+                </p>
+              </div>
+            );
+          })}
+          <p className="rounded border border-border bg-muted/40 p-3 text-[11px] text-muted-foreground">
+            Engineering note: Final selection must be validated against applicable codes, standards, and project specifications.
+          </p>
+        </div>
+      )}
+    </MSection>
   );
 }
 
@@ -224,6 +319,8 @@ function ReportPage() {
               ))}
             </dl>
           </MSection>
+
+          <OverridesSummary input={input} engineResult={engineResult} result={result} />
 
           {sizing && (
             <MSection

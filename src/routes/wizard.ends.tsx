@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
-import { useSelection, type SelectionInput } from "@/lib/SelectionContext";
+import { OverrideField } from "@/components/OverrideField";
+import { useSelection } from "@/lib/SelectionContext";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { PIPE_SIZES, PRESSURE_CLASSES } from "@/lib/valveSelectionEngine";
 
@@ -36,68 +37,6 @@ const OPERATOR_OPTIONS = [
   "Hydraulic Actuator",
   "Spring-Return Pneumatic (Fail-Safe)",
 ];
-
-type OverrideKey = "endConnectionOverride" | "operatorOverride";
-
-function OverrideDropdown({
-  label,
-  recommended,
-  overrideKey,
-  options,
-}: {
-  label: string;
-  recommended: string;
-  overrideKey: OverrideKey;
-  options: string[];
-}) {
-  const { input, update } = useSelection();
-  const current = (input[overrideKey] as string | undefined) ?? "";
-  const isOverridden = !!current && current !== recommended;
-  const effective = isOverridden ? current : recommended;
-  const opts = Array.from(new Set([recommended, ...options].filter(Boolean)));
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-        <span className={`text-xs ${isOverridden ? "text-warning font-medium" : "text-muted-foreground"}`}>
-          {isOverridden ? "User Override" : "Recommended"}
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
-        <Select
-          value={effective}
-          onValueChange={(v) => {
-            if (v === recommended) update({ [overrideKey]: "" } as Partial<SelectionInput>);
-            else update({ [overrideKey]: v } as Partial<SelectionInput>);
-          }}
-        >
-          <SelectTrigger className="h-9 flex-1 font-mono text-sm"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            {opts.map((o) => (
-              <SelectItem key={o} value={o}>
-                {o}{o === recommended ? "  (recommended)" : ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {isOverridden && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-9 px-2 text-xs"
-            onClick={() => update({ [overrideKey]: "" } as Partial<SelectionInput>)}
-          >
-            Reset
-          </Button>
-        )}
-      </div>
-      {isOverridden && (
-        <p className="text-[11px] text-warning">Manual override — engineering review required.</p>
-      )}
-    </div>
-  );
-}
 
 function EndsStep() {
   const { input, update } = useSelection();
@@ -194,17 +133,21 @@ function EndsStep() {
 
       <Card>
         <CardContent className="space-y-4 p-5">
-          <OverrideDropdown
+          <OverrideField
             label="End Connection"
             recommended={engineResult.endConnection}
             overrideKey="endConnectionOverride"
             options={END_CONNECTION_OPTIONS}
+            reasoning={result.rationale.endConnection?.reason || "Selected to match pipe size, pressure class and service per ASME B16.5."}
+            warning="Verify flange facing/end style matches piping spec and gasket selection."
           />
-          <OverrideDropdown
+          <OverrideField
             label="Operator"
             recommended={engineResult.operator}
             overrideKey="operatorOverride"
             options={OPERATOR_OPTIONS}
+            reasoning={result.rationale.operator?.reason || "Operator type chosen for valve size, torque and operating philosophy."}
+            warning="Confirm torque rating, fail-safe action and SIL/ESD requirement against project spec."
           />
         </CardContent>
       </Card>

@@ -1,33 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { StepShell } from "@/components/StepShell";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { OverrideField } from "@/components/OverrideField";
 import { ReferenceBubble, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { useSelectionResult } from "@/lib/useSelectionResult";
-import { useSelection, type SelectionInput } from "@/lib/SelectionContext";
 
 export const Route = createFileRoute("/wizard/materials")({
   head: () => ({ meta: [{ title: "Body / Trim / Seat — Valve Selection Guide" }] }),
   component: MaterialsStep,
 });
 
-type OverrideKey =
-  | "bodyMaterialOverride"
-  | "bodyMaterialSpecOverride"
-  | "seatMaterialOverride"
-  | "discBallMaterialOverride"
-  | "stemMaterialOverride"
-  | "gasketOverride"
-  | "packingOverride";
-
-const OPTIONS: Record<OverrideKey, string[]> = {
+const OPTIONS = {
   bodyMaterialOverride: [
     "Carbon Steel",
     "Carbon Steel (NACE)",
@@ -113,76 +96,7 @@ const OPTIONS: Record<OverrideKey, string[]> = {
     "Low Emission (ISO 15848-1 Class A)",
     "Aramid / PTFE Braided",
   ],
-};
-
-function OverrideRow({
-  label,
-  recommended,
-  overrideKey,
-}: {
-  label: string;
-  recommended: string;
-  overrideKey: OverrideKey;
-}) {
-  const { input, update } = useSelection();
-  const current = (input[overrideKey] as string | undefined) ?? "";
-  const isOverridden = !!current && current !== recommended;
-  const effective = isOverridden ? current : recommended;
-
-  // Merge recommended into options if missing
-  const opts = Array.from(new Set([recommended, ...OPTIONS[overrideKey]].filter(Boolean)));
-
-  return (
-    <div className="border-b border-border py-3 last:border-0">
-      <div className="flex items-baseline justify-between gap-4">
-        <dt className="text-sm text-muted-foreground">{label}</dt>
-        <dd className="text-right text-xs">
-          {isOverridden ? (
-            <span className="text-warning font-medium">User Override</span>
-          ) : (
-            <span className="text-muted-foreground">Recommended</span>
-          )}
-        </dd>
-      </div>
-      <div className="mt-2 flex items-center gap-2">
-        <Select
-          value={effective}
-          onValueChange={(v) => {
-            if (v === recommended) update({ [overrideKey]: "" } as Partial<SelectionInput>);
-            else update({ [overrideKey]: v } as Partial<SelectionInput>);
-          }}
-        >
-          <SelectTrigger className="h-9 flex-1 font-mono text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {opts.map((o) => (
-              <SelectItem key={o} value={o}>
-                {o}
-                {o === recommended ? "  (recommended)" : ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {isOverridden && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-9 px-2 text-xs"
-            onClick={() => update({ [overrideKey]: "" } as Partial<SelectionInput>)}
-          >
-            Reset
-          </Button>
-        )}
-      </div>
-      {isOverridden && (
-        <p className="mt-1 text-[11px] text-warning">
-          Manual override — engineering review required.
-        </p>
-      )}
-    </div>
-  );
-}
+} as const;
 
 function MaterialsStep() {
   const { result, engineResult } = useSelectionResult();
@@ -190,17 +104,20 @@ function MaterialsStep() {
     ...(result.rationale.bodyMaterial?.refs || []),
     ...(result.rationale.trim?.refs || []),
   ];
+  const bodyReason = result.rationale.bodyMaterial?.reason;
+  const trimReason = result.rationale.trim?.reason;
+
   return (
     <StepShell
       step="/wizard/materials"
       title="Body, Trim & Seat Materials"
-      subtitle="Materials derived from your service type, temperature and pressure class per ASME B16.34 and API 615. Pick from the dropdown to override the engine recommendation."
+      subtitle="Materials derived from your service type, temperature and pressure class per ASME B16.34 and API 615. Each field is locked to the engineering recommendation — click ‘Override recommendation’ to change it."
       aside={
         <>
-          {result.rationale.bodyMaterial && (
+          {bodyReason && (
             <>
               <WhyCard>
-                <p className="mb-2"><strong className="text-foreground">Body: </strong>{result.rationale.bodyMaterial.reason}</p>
+                <p className="mb-2"><strong className="text-foreground">Body: </strong>{bodyReason}</p>
               </WhyCard>
               <LearningMoment>
                 Body material is set by <strong>fluid + temperature</strong>: WCB carbon steel covers most
@@ -209,17 +126,10 @@ function MaterialsStep() {
               </LearningMoment>
             </>
           )}
-          {result.rationale.trim && (
-            <>
-              <WhyCard>
-                <p><strong className="text-foreground">Trim: </strong>{result.rationale.trim.reason}</p>
-              </WhyCard>
-              <LearningMoment>
-                Trim (seat, disc, stem) handles the actual flow shear. It&apos;s typically harder than the
-                body — Stellite overlay or hardened 410SS resists erosion in throttling and high-velocity
-                service. Soft seats (PTFE/PEEK) give bubble-tight shutoff but cap the temperature rating.
-              </LearningMoment>
-            </>
+          {trimReason && (
+            <WhyCard>
+              <p><strong className="text-foreground">Trim: </strong>{trimReason}</p>
+            </WhyCard>
           )}
           {Array.from(new Set(refs)).slice(0, 4).map((ref) => (
             <ReferenceBubble key={ref} standard={ref.split(/[(§]/)[0].trim()} note={ref} />
@@ -228,31 +138,74 @@ function MaterialsStep() {
       }
     >
       <Card>
-        <CardContent className="p-5">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Body</p>
-          <dl>
-            <OverrideRow label="Body material" recommended={engineResult.bodyMaterial} overrideKey="bodyMaterialOverride" />
-            <OverrideRow label="Body material specification" recommended={engineResult.bodyMaterialSpec} overrideKey="bodyMaterialSpecOverride" />
-          </dl>
+        <CardContent className="space-y-5 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Body</p>
+          <OverrideField
+            label="Body material"
+            recommended={engineResult.bodyMaterial}
+            overrideKey="bodyMaterialOverride"
+            options={[...OPTIONS.bodyMaterialOverride]}
+            reasoning={bodyReason || "Based on fluid, temperature and pressure class per ASME B16.34 / API 615."}
+            warning="Selected material may not meet design temperature, pressure or service compatibility. Re-check P-T rating and corrosion allowance."
+          />
+          <OverrideField
+            label="Body material specification"
+            recommended={engineResult.bodyMaterialSpec}
+            overrideKey="bodyMaterialSpecOverride"
+            options={[...OPTIONS.bodyMaterialSpecOverride]}
+            reasoning="ASTM grade aligned with body material and service (NACE / sour / low-temp variants where applicable)."
+            warning="Verify ASTM grade matches selected body material and is permitted for the service category."
+          />
         </CardContent>
       </Card>
       <Card>
-        <CardContent className="p-5">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trim</p>
-          <dl>
-            <OverrideRow label="Seat material" recommended={engineResult.seatMaterial} overrideKey="seatMaterialOverride" />
-            <OverrideRow label="Disc / Ball material" recommended={engineResult.discBallMaterial} overrideKey="discBallMaterialOverride" />
-            <OverrideRow label="Stem material" recommended={engineResult.stemMaterial} overrideKey="stemMaterialOverride" />
-          </dl>
+        <CardContent className="space-y-5 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trim</p>
+          <OverrideField
+            label="Seat material"
+            recommended={engineResult.seatMaterial}
+            overrideKey="seatMaterialOverride"
+            options={[...OPTIONS.seatMaterialOverride]}
+            reasoning={trimReason || "Soft seats (PTFE/PEEK) for tight shutoff at moderate temperatures; metal seats for high-temp / abrasive service."}
+            warning="Check seat temperature limit and shutoff class against design conditions."
+          />
+          <OverrideField
+            label="Disc / Ball material"
+            recommended={engineResult.discBallMaterial}
+            overrideKey="discBallMaterialOverride"
+            options={[...OPTIONS.discBallMaterialOverride]}
+            reasoning="Trim hardness/coating selected for erosion, throttling and corrosion resistance."
+            warning="May impact erosion life and shutoff performance — confirm with vendor."
+          />
+          <OverrideField
+            label="Stem material"
+            recommended={engineResult.stemMaterial}
+            overrideKey="stemMaterialOverride"
+            options={[...OPTIONS.stemMaterialOverride]}
+            reasoning="Stem grade chosen for strength, galling and corrosion resistance vs. body/packing."
+            warning="Check galvanic compatibility with body and packing; verify NACE compliance for sour service."
+          />
         </CardContent>
       </Card>
       <Card>
-        <CardContent className="p-5">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sealing</p>
-          <dl>
-            <OverrideRow label="Gasket" recommended={engineResult.gasket} overrideKey="gasketOverride" />
-            <OverrideRow label="Packing" recommended={engineResult.packing} overrideKey="packingOverride" />
-          </dl>
+        <CardContent className="space-y-5 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sealing</p>
+          <OverrideField
+            label="Gasket"
+            recommended={engineResult.gasket}
+            overrideKey="gasketOverride"
+            options={[...OPTIONS.gasketOverride]}
+            reasoning="Gasket type matched to flange facing, pressure class and service (RTJ for high-pressure, spiral-wound elsewhere)."
+            warning="Ensure gasket type matches flange facing (RF/RTJ/FF) and pressure class."
+          />
+          <OverrideField
+            label="Packing"
+            recommended={engineResult.packing}
+            overrideKey="packingOverride"
+            options={[...OPTIONS.packingOverride]}
+            reasoning="Packing chosen for fugitive-emissions class and temperature; live-loaded graphite for low-emission service."
+            warning="Verify packing meets project fugitive emission requirement (e.g. ISO 15848-1)."
+          />
         </CardContent>
       </Card>
     </StepShell>
