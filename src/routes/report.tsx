@@ -384,6 +384,24 @@ function ReportPage() {
         </div>
       </div>
 
+      <div className="flex flex-wrap items-center justify-end gap-2 border-t pt-6">
+        <Button variant="outline" onClick={onSave}>
+          <Save className="h-4 w-4" /> Save
+        </Button>
+        <Button variant="outline" onClick={downloadHtml}>
+          <Download className="h-4 w-4" /> Download HTML
+        </Button>
+        <Button variant="outline" onClick={exportExcel}>
+          <FileSpreadsheet className="h-4 w-4" /> Export Excel
+        </Button>
+        <Button variant="outline" onClick={exportPdf}>
+          <Printer className="h-4 w-4" /> Export PDF
+        </Button>
+        <Button className="bg-gradient-accent text-primary-foreground shadow-glow" onClick={() => setPreviewOpen(true)}>
+          <Eye className="h-4 w-4" /> View Datasheet
+        </Button>
+      </div>
+
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-6xl p-0 sm:rounded-lg overflow-hidden">
           <DialogHeader className="border-b px-5 py-3">
