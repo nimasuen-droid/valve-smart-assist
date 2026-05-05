@@ -65,25 +65,34 @@ function TypeStep() {
         </>
       }
     >
+      {/* Recommended valve type — green/star, with reasoning */}
       <Card className={isOverridden ? "border-warning/50 bg-warning/5" : "border-success/40 bg-success/5"}>
         <CardContent className="flex gap-3 p-4">
           {isOverridden ? (
             <AlertTriangle className="mt-0.5 h-5 w-5 text-warning" />
           ) : (
-            <CheckCircle2 className="mt-0.5 h-5 w-5 text-success" />
+            <Star className="mt-0.5 h-5 w-5 fill-success text-success" />
           )}
           <div className="flex-1">
             <div className="flex items-center justify-between gap-2">
-              <p className="font-medium text-foreground">{result.valveType || "—"}</p>
+              <p className="font-medium text-foreground">{engineResult.valveType || "—"}</p>
               <span
-                className={`text-[11px] font-semibold uppercase tracking-wider ${
+                className={`inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider ${
                   isOverridden ? "text-warning" : "text-success"
                 }`}
               >
-                {isOverridden ? "User Override" : "Recommended"}
+                {isOverridden ? <><AlertTriangle className="h-3 w-3" /> Override active</> : <><Star className="h-3 w-3 fill-success text-success" /> Recommended</>}
               </span>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">{result.valveSubtype}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{engineResult.valveSubtype}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">Based on input conditions and engineering logic.</p>
+            {isOverridden && (
+              <p className="mt-2 text-xs">
+                <span className="text-muted-foreground">Selected: </span>
+                <span className="font-mono font-medium text-warning">{result.valveType}</span>
+                <span className="ml-1 text-[10px] uppercase tracking-wider text-warning/80">(Override)</span>
+              </p>
+            )}
             {r?.rule && (
               <p className="mt-2 text-xs text-muted-foreground border-l-2 border-muted-foreground/40 pl-2">
                 <span className="font-semibold text-foreground">Rule: </span>
