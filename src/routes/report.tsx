@@ -481,7 +481,7 @@ function ReportPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-2 border-t pt-6">
+      <div className="flex flex-wrap items-center justify-start gap-2 border-t pt-6">
         <Button asChild variant="outline" size="sm">
           <Link to="/wizard/project"><ArrowLeft className="h-4 w-4" /> Inputs</Link>
         </Button>
