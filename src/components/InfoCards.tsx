@@ -2,7 +2,13 @@ import { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Lightbulb, BookOpen, ShieldCheck, GraduationCap } from "lucide-react";
 
-export function LearningMoment({ title = "Learning moment", children }: { title?: string; children: ReactNode }) {
+export function LearningMoment({
+  title = "Learning moment",
+  children,
+}: {
+  title?: string;
+  children: ReactNode;
+}) {
   return (
     <div className="flex gap-3 rounded-lg border border-accent/40 bg-accent/10 p-3">
       <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/20">
@@ -25,7 +31,9 @@ export function WhyCard({ children }: { children: ReactNode }) {
         <Lightbulb className="h-4 w-4 text-primary" />
         <CardTitle className="text-sm">Why this was selected</CardTitle>
       </CardHeader>
-      <CardContent className="text-sm leading-relaxed text-muted-foreground">{children}</CardContent>
+      <CardContent className="text-sm leading-relaxed text-muted-foreground">
+        {children}
+      </CardContent>
     </Card>
   );
 }

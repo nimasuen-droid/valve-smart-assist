@@ -1,7 +1,13 @@
 import { useState, type ReactNode } from "react";
 import { Star, AlertTriangle, Lock, Unlock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useSelection, type SelectionInput } from "@/lib/SelectionContext";
 
@@ -30,7 +36,7 @@ export interface OverrideFieldProps {
 
 /**
  * Standardized "Recommended vs Override" interaction.
- * - Recommended value is locked by default with green ★ + reasoning.
+ * - Recommended value is locked by default with a green recommended status and reasoning.
  * - "Override recommendation" unlocks the field, shows advisory, status badge, reason field.
  */
 export function OverrideField({
@@ -90,7 +96,9 @@ export function OverrideField({
         <div className="flex items-center gap-2">
           <Star className="h-3.5 w-3.5 shrink-0 fill-success text-success" />
           <span className="font-mono text-sm font-medium text-success">{recommended || "—"}</span>
-          <span className="ml-auto text-[10px] uppercase tracking-wider text-success/70">Recommended</span>
+          <span className="ml-auto text-[10px] uppercase tracking-wider text-success/70">
+            Recommended
+          </span>
         </div>
         <p className="mt-1 pl-5 text-[11px] text-muted-foreground">{reasoning}</p>
       </div>
@@ -107,7 +115,8 @@ export function OverrideField({
       ) : (
         <div className="space-y-2 rounded-md border border-warning/30 bg-warning/5 p-3">
           <p className="text-[11px] text-warning">
-            Manual override should be based on project specification, applicable codes, service conditions, or engineering judgment.
+            Manual override should be based on project specification, applicable codes, service
+            conditions, or engineering judgment.
           </p>
 
           {renderPicker ? (
@@ -120,7 +129,14 @@ export function OverrideField({
               <SelectContent>
                 {opts.map((o) => (
                   <SelectItem key={o} value={o}>
-                    {o === recommended ? `★ ${o} (recommended)` : o}
+                    {o === recommended ? (
+                      <span className="inline-flex items-center gap-1">
+                        <Star className="h-3 w-3 fill-success text-success" />
+                        {o} (recommended)
+                      </span>
+                    ) : (
+                      o
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -131,7 +147,9 @@ export function OverrideField({
             <p className="text-xs">
               <span className="text-muted-foreground">Selected: </span>
               <span className="font-mono font-medium text-warning">{current}</span>
-              <span className="ml-1 text-[10px] uppercase tracking-wider text-warning/80">(Override)</span>
+              <span className="ml-1 text-[10px] uppercase tracking-wider text-warning/80">
+                (Override)
+              </span>
             </p>
           )}
 
@@ -146,7 +164,9 @@ export function OverrideField({
               className="min-h-[60px] text-xs"
             />
             {isOverridden && !reason.trim() && (
-              <p className="mt-1 text-[11px] text-destructive">A justification is required for traceability.</p>
+              <p className="mt-1 text-[11px] text-destructive">
+                A justification is required for traceability.
+              </p>
             )}
           </div>
 

@@ -3,7 +3,13 @@ import { StepShell } from "@/components/StepShell";
 import { HelperField } from "@/components/HelperField";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ReferenceBubble, WarningBanner, WhyCard, LearningMoment } from "@/components/InfoCards";
 import { OverrideField } from "@/components/OverrideField";
 import { useSelection } from "@/lib/SelectionContext";
@@ -57,18 +63,23 @@ function EndsStep() {
               {asmeRec.note}
               {classMismatch && (
                 <span className="mt-1 block text-warning">
-                  Selected class {input.pressureClass} differs from recommended {asmeRec.recommendedClass}.
+                  Selected class {input.pressureClass} differs from recommended{" "}
+                  {asmeRec.recommendedClass}.
                 </span>
               )}
             </WhyCard>
           )}
           <LearningMoment>
-            Pressure class isn&apos;t just a number — ASME B16.5 derates allowable pressure as temperature rises.
-            A Class 300 flange holding 740 psi at ambient may only hold ~600 psi at 400 °C. Always check the
-            P-T table at <em>design temperature</em>, not ambient.
+            Pressure class isn&apos;t just a number — ASME B16.5 derates allowable pressure as
+            temperature rises. A Class 300 flange holding 740 psi at ambient may only hold ~600 psi
+            at 400 °C. Always check the P-T table at <em>design temperature</em>, not ambient.
           </LearningMoment>
           {asmeWarning && (
-            <WarningBanner title={asmeWarning.type === "caution" ? "ASME B16.5 caution" : "ASME B16.5 rating exceeded"}>
+            <WarningBanner
+              title={
+                asmeWarning.type === "caution" ? "ASME B16.5 caution" : "ASME B16.5 rating exceeded"
+              }
+            >
               {asmeWarning.warning}
             </WarningBanner>
           )}
@@ -93,22 +104,33 @@ function EndsStep() {
       <div className="grid gap-5 md:grid-cols-2">
         <HelperField label="Pipe size (NPS)" helper="Nominal pipe size of the line.">
           <Select value={input.pipeSize} onValueChange={(v) => update({ pipeSize: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent className="max-h-72">
               {(PIPE_SIZES as string[]).map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </HelperField>
-        <HelperField label="Pressure class" helper="ASME B16.5 / B16.34 rating class." reference="B16.5">
+        <HelperField
+          label="Pressure class"
+          helper="ASME B16.5 / B16.34 rating class."
+          reference="B16.5"
+        >
           <div className="flex items-center gap-2">
             <Select value={input.pressureClass} onValueChange={(v) => update({ pressureClass: v })}>
-              <SelectTrigger className={classMismatch ? "border-warning" : ""}><SelectValue /></SelectTrigger>
+              <SelectTrigger className={classMismatch ? "border-warning" : ""}>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {(PRESSURE_CLASSES as string[]).map((c) => (
                   <SelectItem key={c} value={c}>
-                    {c}{asmeRec && c === asmeRec.recommendedClass ? "  (recommended)" : ""}
+                    {c}
+                    {asmeRec && c === asmeRec.recommendedClass ? "  (recommended)" : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -125,7 +147,8 @@ function EndsStep() {
           </div>
           {classMismatch && (
             <p className="mt-1 text-[11px] text-warning">
-              ASME B16.5 recommends {asmeRec!.recommendedClass} for {input.designPressure} barg @ {input.designTemp}°C.
+              ASME B16.5 recommends {asmeRec!.recommendedClass} for {input.designPressure} barg @{" "}
+              {input.designTemp} °C.
             </p>
           )}
         </HelperField>
@@ -138,7 +161,10 @@ function EndsStep() {
             recommended={engineResult.endConnection}
             overrideKey="endConnectionOverride"
             options={END_CONNECTION_OPTIONS}
-            reasoning={result.rationale.endConnection?.reason || "Selected to match pipe size, pressure class and service per ASME B16.5."}
+            reasoning={
+              result.rationale.endConnection?.reason ||
+              "Selected to match pipe size, pressure class and service per ASME B16.5."
+            }
             warning="Verify flange facing/end style matches piping spec and gasket selection."
           />
           <OverrideField
@@ -146,19 +172,36 @@ function EndsStep() {
             recommended={engineResult.operator}
             overrideKey="operatorOverride"
             options={OPERATOR_OPTIONS}
-            reasoning={result.rationale.operator?.reason || "Operator type chosen for valve size, torque and operating philosophy."}
+            reasoning={
+              result.rationale.operator?.reason ||
+              "Operator type chosen for valve size, torque and operating philosophy."
+            }
             warning="Confirm torque rating, fail-safe action and SIL/ESD requirement against project spec."
           />
         </CardContent>
       </Card>
 
       <div className="rounded-lg border border-border bg-card/40 p-4 text-sm">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Computed end-connection package</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Computed end-connection package
+        </p>
         <dl className="grid gap-2 sm:grid-cols-2">
-          <div className="flex justify-between"><dt className="text-muted-foreground">End connection</dt><dd className="font-mono">{result.endConnection || "—"}</dd></div>
-          <div className="flex justify-between"><dt className="text-muted-foreground">End standard</dt><dd className="font-mono">{result.endConnectionStd || "—"}</dd></div>
-          <div className="flex justify-between"><dt className="text-muted-foreground">Flange standard</dt><dd className="font-mono">{result.flangeStandard || "—"}</dd></div>
-          <div className="flex justify-between"><dt className="text-muted-foreground">Operator</dt><dd className="font-mono">{result.operator || "—"}</dd></div>
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">End connection</dt>
+            <dd className="font-mono">{result.endConnection || "—"}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">End standard</dt>
+            <dd className="font-mono">{result.endConnectionStd || "—"}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">Flange standard</dt>
+            <dd className="font-mono">{result.flangeStandard || "—"}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">Operator</dt>
+            <dd className="font-mono">{result.operator || "—"}</dd>
+          </div>
         </dl>
       </div>
     </StepShell>

@@ -21,6 +21,7 @@ Selecting an industrial valve is a multi-variable engineering decision that toda
 ## What has been built
 
 ### Wizard (step-by-step selection)
+
 1. **Project** — project name, tag, client, area, line info.
 2. **Conditions** — service, fluid, design temperature & pressure, location.
 3. **Function** — isolation, throttling/control, check, etc. (drives whether sizing step appears).
@@ -32,6 +33,7 @@ Selecting an industrial valve is a multi-variable engineering decision that toda
 9. **Report** — full datasheet with rationale, warnings, references, and export.
 
 ### Engines & datasets
+
 - **Valve selection engine** (`src/lib/valveSelectionEngine.js`) — rule-based selection per API 615, returns recommendation, alternatives, warnings, and per-field rationale (basic + expert).
 - **ASME B16.5 P-T checker** (`src/lib/asmeB165Ratings.js`) — Group 1.1 (A216 WCB) ratings table with temperature derating; recommends the minimum adequate class.
 - **IEC 60534 sizing** (`src/lib/sizing.ts`) — liquid & gas Cv/Kv calculation with choked-flow checks.
@@ -39,6 +41,7 @@ Selecting an industrial valve is a multi-variable engineering decision that toda
 - **Sample cases** (`src/lib/sampleCases.ts`) — preloaded examples for demos & teaching.
 
 ### UX
+
 - Mobile-first refactor: bottom navigation, full-screen wizard steps, fixed Back (bottom-left) / Next (bottom-right) bar.
 - Per-step validation with auto-save.
 - "Learning Moment" cards throughout the wizard.
@@ -92,14 +95,14 @@ src/
 
 ## Getting started
 
-Prerequisites: [Bun](https://bun.sh) (recommended) or Node 20+.
+Prerequisites: Node 20+ with npm.
 
 ```bash
-bun install
-bun run dev          # http://localhost:5173
-bun run build        # production build
-bun run lint
-bun run format
+npm install
+npm run dev          # http://localhost:5173
+npm run build        # production build
+npm run lint
+npm run format
 ```
 
 The app is fully client-side today — no environment variables or backend required to run locally.
@@ -108,16 +111,16 @@ The app is fully client-side today — no environment variables or backend requi
 
 ## Where collaborators should start
 
-| You want to… | Start here |
-|---|---|
-| Add a new valve type or change selection rules | `src/lib/valveSelectionEngine.js` |
-| Update P-T tables or add a new material group | `src/lib/asmeB165Ratings.js` |
-| Improve control-valve sizing or add cavitation/noise checks | `src/lib/sizing.ts`, `src/routes/wizard.sizing.tsx` |
-| Add/modify a wizard step | `src/routes/wizard.<step>.tsx` + `src/components/StepShell.tsx` |
-| Change the report / datasheet layout or export | `src/routes/report.tsx`, `src/lib/datasheetUtils.js` |
-| Tweak design tokens (colors, fonts, spacing) | `src/styles.css` (define tokens in `oklch`, never hardcode colors in components) |
-| Add a new top-level page | Create `src/routes/<name>.tsx` (TanStack file-based routing) |
-| Add a sample case for demos/tests | `src/lib/sampleCases.ts` |
+| You want to…                                                | Start here                                                                       |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Add a new valve type or change selection rules              | `src/lib/valveSelectionEngine.js`                                                |
+| Update P-T tables or add a new material group               | `src/lib/asmeB165Ratings.js`                                                     |
+| Improve control-valve sizing or add cavitation/noise checks | `src/lib/sizing.ts`, `src/routes/wizard.sizing.tsx`                              |
+| Add/modify a wizard step                                    | `src/routes/wizard.<step>.tsx` + `src/components/StepShell.tsx`                  |
+| Change the report / datasheet layout or export              | `src/routes/report.tsx`, `src/lib/datasheetUtils.js`                             |
+| Tweak design tokens (colors, fonts, spacing)                | `src/styles.css` (define tokens in `oklch`, never hardcode colors in components) |
+| Add a new top-level page                                    | Create `src/routes/<name>.tsx` (TanStack file-based routing)                     |
+| Add a sample case for demos/tests                           | `src/lib/sampleCases.ts`                                                         |
 
 ### Conventions
 
@@ -149,4 +152,4 @@ Questions, defect reports, or dataset update requests: **nimasuen@gmail.com**
 
 ---
 
-*Valve Selection Guide · by Nosa Imasuen*
+_Valve Selection Guide · by Nosa Imasuen_

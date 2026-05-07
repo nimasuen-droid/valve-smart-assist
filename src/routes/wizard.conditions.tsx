@@ -4,7 +4,13 @@ import { HelperField } from "@/components/HelperField";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ReferenceBubble, WarningBanner, WhyCard } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { SERVICE_TYPES, FLUID_TYPES, INSTALLATION_LOCATIONS } from "@/lib/valveSelectionEngine";
@@ -17,8 +23,12 @@ export const Route = createFileRoute("/wizard/conditions")({
 
 function ConditionsStep() {
   const { input, update } = useSelection();
-  const u = (patch: Partial<typeof input>) => update({ ...patch, isSample: false, sampleTitle: undefined });
-  const asmeRec = recommendPressureClass({ designTemp: input.designTemp, designPressure: input.designPressure });
+  const u = (patch: Partial<typeof input>) =>
+    update({ ...patch, isSample: false, sampleTitle: undefined });
+  const asmeRec = recommendPressureClass({
+    designTemp: input.designTemp,
+    designPressure: input.designPressure,
+  });
   const asmeWarn = checkAsmeB165Rating({
     pressureClass: input.pressureClass,
     designTemp: input.designTemp,
@@ -32,14 +42,20 @@ function ConditionsStep() {
       aside={
         <>
           <WarningBanner title="Use design, not operating">
-            Always rate the valve at design pressure and the more severe of design or upset temperature.
+            Always rate the valve at design pressure and the more severe of design or upset
+            temperature.
           </WarningBanner>
           {asmeWarn && (
-            <WarningBanner title={asmeWarn.type === "caution" ? "ASME B16.5 caution" : "ASME B16.5 rating exceeded"}>
+            <WarningBanner
+              title={
+                asmeWarn.type === "caution" ? "ASME B16.5 caution" : "ASME B16.5 rating exceeded"
+              }
+            >
               {asmeWarn.warning}
               {asmeRec && asmeRec.recommendedClass !== input.pressureClass && (
                 <span className="mt-2 block">
-                  Recommended minimum class for {input.designPressure} barg @ {input.designTemp}°C: <strong>{asmeRec.recommendedClass}</strong>.
+                  Recommended minimum class for {input.designPressure} barg @ {input.designTemp} °C:{" "}
+                  <strong>{asmeRec.recommendedClass}</strong>.
                 </span>
               )}
             </WarningBanner>
@@ -50,13 +66,20 @@ function ConditionsStep() {
               {asmeRec.note}
               {asmeRec.recommendedClass !== input.pressureClass && (
                 <span className="mt-1 block text-warning">
-                  Current selected class {input.pressureClass} differs from recommended {asmeRec.recommendedClass}.
+                  Current selected class {input.pressureClass} differs from recommended{" "}
+                  {asmeRec.recommendedClass}.
                 </span>
               )}
             </WhyCard>
           )}
-          <ReferenceBubble standard="ASME B16.5" note="Pressure-temperature ratings for flanges and flanged valves." />
-          <ReferenceBubble standard="ASME B16.34" note="P-T ratings for flanged, threaded & welded valves." />
+          <ReferenceBubble
+            standard="ASME B16.5"
+            note="Pressure-temperature ratings for flanges and flanged valves."
+          />
+          <ReferenceBubble
+            standard="ASME B16.34"
+            note="P-T ratings for flanged, threaded & welded valves."
+          />
         </>
       }
     >
@@ -68,54 +91,126 @@ function ConditionsStep() {
         </div>
       )}
       <div className="grid gap-5 md:grid-cols-2">
-        <HelperField label="Service type" helper="Process service category — drives material and special-service rules.">
+        <HelperField
+          label="Service type"
+          helper="Process service category — drives material and special-service rules."
+        >
           <Select value={input.serviceType} onValueChange={(v) => u({ serviceType: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent className="max-h-72">
               {(SERVICE_TYPES as string[]).map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </HelperField>
-        <HelperField label="Fluid type / phase" helper="Liquid, gas, two-phase or slurry — affects valve type and trim.">
+        <HelperField
+          label="Fluid type / phase"
+          helper="Liquid, gas, two-phase or slurry — affects valve type and trim."
+        >
           <Select value={input.fluidType} onValueChange={(v) => u({ fluidType: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {(FLUID_TYPES as string[]).map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </HelperField>
-        <HelperField label="Design pressure (barg)" helper="Maximum pressure the valve must contain at design temperature." reference="B16.5">
-          <Input type="number" value={input.designPressure} onChange={(e) => u({ designPressure: e.target.value })} placeholder="e.g. 95" />
+        <HelperField
+          label="Design pressure (barg)"
+          helper="Maximum pressure the valve must contain at design temperature."
+          reference="B16.5"
+        >
+          <Input
+            type="number"
+            value={input.designPressure}
+            onChange={(e) => u({ designPressure: e.target.value })}
+            placeholder="e.g. 95"
+          />
         </HelperField>
-        <HelperField label="Design temperature (°C)" helper="Use the more severe of upset or minimum design temperature.">
-          <Input type="number" value={input.designTemp} onChange={(e) => u({ designTemp: e.target.value })} placeholder="e.g. 180" />
+        <HelperField
+          label="Design temperature (°C)"
+          helper="Use the more severe of upset or minimum design temperature."
+        >
+          <Input
+            type="number"
+            value={input.designTemp}
+            onChange={(e) => u({ designTemp: e.target.value })}
+            placeholder="e.g. 180"
+          />
         </HelperField>
-        <HelperField label="Operating pressure (barg)" helper="Normal steady-state operating pressure.">
-          <Input type="number" value={input.operatingPressure ?? ""} onChange={(e) => u({ operatingPressure: e.target.value })} placeholder="e.g. 70" />
+        <HelperField
+          label="Operating pressure (barg)"
+          helper="Normal steady-state operating pressure."
+        >
+          <Input
+            type="number"
+            value={input.operatingPressure ?? ""}
+            onChange={(e) => u({ operatingPressure: e.target.value })}
+            placeholder="e.g. 70"
+          />
         </HelperField>
-        <HelperField label="Operating temperature (°C)" helper="Normal steady-state operating temperature.">
-          <Input type="number" value={input.operatingTemp ?? ""} onChange={(e) => u({ operatingTemp: e.target.value })} placeholder="e.g. 45" />
+        <HelperField
+          label="Operating temperature (°C)"
+          helper="Normal steady-state operating temperature."
+        >
+          <Input
+            type="number"
+            value={input.operatingTemp ?? ""}
+            onChange={(e) => u({ operatingTemp: e.target.value })}
+            placeholder="e.g. 45"
+          />
         </HelperField>
-        <HelperField label="Flow condition" helper="Continuous, intermittent, static (ready-to-flow), pulsating, etc.">
-          <Input value={input.flowCondition ?? ""} onChange={(e) => u({ flowCondition: e.target.value })} placeholder="e.g. Continuous, dry gas" />
+        <HelperField
+          label="Flow condition"
+          helper="Continuous, intermittent, static (ready-to-flow), pulsating, etc."
+        >
+          <Input
+            value={input.flowCondition ?? ""}
+            onChange={(e) => u({ flowCondition: e.target.value })}
+            placeholder="e.g. Continuous, dry gas"
+          />
         </HelperField>
-        <HelperField label="Installation location" helper="Plant environment — affects coatings, materials and actuator selection.">
-          <Select value={input.installationLocation} onValueChange={(v) => u({ installationLocation: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+        <HelperField
+          label="Installation location"
+          helper="Plant environment — affects coatings, materials and actuator selection."
+        >
+          <Select
+            value={input.installationLocation}
+            onValueChange={(v) => u({ installationLocation: v })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent className="max-h-72">
               {(INSTALLATION_LOCATIONS as string[]).map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </HelperField>
         <div className="md:col-span-2">
-          <HelperField label="Notes / service description" helper="Free-text engineering note carried into the datasheet.">
-            <Textarea value={input.notes ?? ""} onChange={(e) => u({ notes: e.target.value })} rows={3} placeholder="e.g. Topside HP produced gas isolation downstream of inlet separator." />
+          <HelperField
+            label="Notes / service description"
+            helper="Free-text engineering note carried into the datasheet."
+          >
+            <Textarea
+              value={input.notes ?? ""}
+              onChange={(e) => u({ notes: e.target.value })}
+              rows={3}
+              placeholder="e.g. Topside HP produced gas isolation downstream of inlet separator."
+            />
           </HelperField>
         </div>
       </div>

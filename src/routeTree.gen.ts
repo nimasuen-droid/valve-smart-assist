@@ -9,11 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as ReleaseRouteImport } from './routes/release'
 import { Route as ReferencesRouteImport } from './routes/references'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ManualRouteImport } from './routes/manual'
 import { Route as EulaRouteImport } from './routes/eula'
 import { Route as AboutRouteImport } from './routes/about'
@@ -27,6 +29,11 @@ import { Route as WizardFunctionRouteImport } from './routes/wizard.function'
 import { Route as WizardEndsRouteImport } from './routes/wizard.ends'
 import { Route as WizardConditionsRouteImport } from './routes/wizard.conditions'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -50,6 +57,11 @@ const ReleaseRoute = ReleaseRouteImport.update({
 const ReferencesRoute = ReferencesRouteImport.update({
   id: '/references',
   path: '/references',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManualRoute = ManualRouteImport.update({
@@ -118,11 +130,13 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/eula': typeof EulaRoute
   '/manual': typeof ManualRoute
+  '/privacy': typeof PrivacyRoute
   '/references': typeof ReferencesRoute
   '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
   '/wizard/conditions': typeof WizardConditionsRoute
   '/wizard/ends': typeof WizardEndsRoute
   '/wizard/function': typeof WizardFunctionRoute
@@ -137,11 +151,13 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/eula': typeof EulaRoute
   '/manual': typeof ManualRoute
+  '/privacy': typeof PrivacyRoute
   '/references': typeof ReferencesRoute
   '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
   '/wizard/conditions': typeof WizardConditionsRoute
   '/wizard/ends': typeof WizardEndsRoute
   '/wizard/function': typeof WizardFunctionRoute
@@ -157,11 +173,13 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/eula': typeof EulaRoute
   '/manual': typeof ManualRoute
+  '/privacy': typeof PrivacyRoute
   '/references': typeof ReferencesRoute
   '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
   '/wizard/conditions': typeof WizardConditionsRoute
   '/wizard/ends': typeof WizardEndsRoute
   '/wizard/function': typeof WizardFunctionRoute
@@ -178,11 +196,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/eula'
     | '/manual'
+    | '/privacy'
     | '/references'
     | '/release'
     | '/report'
     | '/saved'
     | '/settings'
+    | '/terms'
     | '/wizard/conditions'
     | '/wizard/ends'
     | '/wizard/function'
@@ -197,11 +217,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/eula'
     | '/manual'
+    | '/privacy'
     | '/references'
     | '/release'
     | '/report'
     | '/saved'
     | '/settings'
+    | '/terms'
     | '/wizard/conditions'
     | '/wizard/ends'
     | '/wizard/function'
@@ -216,11 +238,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/eula'
     | '/manual'
+    | '/privacy'
     | '/references'
     | '/release'
     | '/report'
     | '/saved'
     | '/settings'
+    | '/terms'
     | '/wizard/conditions'
     | '/wizard/ends'
     | '/wizard/function'
@@ -236,11 +260,13 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   EulaRoute: typeof EulaRoute
   ManualRoute: typeof ManualRoute
+  PrivacyRoute: typeof PrivacyRoute
   ReferencesRoute: typeof ReferencesRoute
   ReleaseRoute: typeof ReleaseRoute
   ReportRoute: typeof ReportRoute
   SavedRoute: typeof SavedRoute
   SettingsRoute: typeof SettingsRoute
+  TermsRoute: typeof TermsRoute
   WizardConditionsRoute: typeof WizardConditionsRoute
   WizardEndsRoute: typeof WizardEndsRoute
   WizardFunctionRoute: typeof WizardFunctionRoute
@@ -253,6 +279,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -286,6 +319,13 @@ declare module '@tanstack/react-router' {
       path: '/references'
       fullPath: '/references'
       preLoaderRoute: typeof ReferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manual': {
@@ -380,11 +420,13 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   EulaRoute: EulaRoute,
   ManualRoute: ManualRoute,
+  PrivacyRoute: PrivacyRoute,
   ReferencesRoute: ReferencesRoute,
   ReleaseRoute: ReleaseRoute,
   ReportRoute: ReportRoute,
   SavedRoute: SavedRoute,
   SettingsRoute: SettingsRoute,
+  TermsRoute: TermsRoute,
   WizardConditionsRoute: WizardConditionsRoute,
   WizardEndsRoute: WizardEndsRoute,
   WizardFunctionRoute: WizardFunctionRoute,
@@ -397,3 +439,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

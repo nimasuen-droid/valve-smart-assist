@@ -35,8 +35,8 @@ export function WizardNav({ current }: { current: string }) {
               i === idx
                 ? "border-primary bg-primary/15 text-primary"
                 : i < idx
-                ? "border-success/40 bg-success/10 text-success"
-                : "border-border bg-card text-muted-foreground hover:text-foreground"
+                  ? "border-success/40 bg-success/10 text-success"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
             }`}
           >
             {i + 1}. {s.label}

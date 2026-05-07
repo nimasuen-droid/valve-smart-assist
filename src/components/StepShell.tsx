@@ -35,7 +35,10 @@ function useMobileSteps(currentStep: string) {
   }, [isThrottling, currentStep]);
 }
 
-function validateStep(step: string, input: ReturnType<typeof useSelection>["input"]): string | null {
+function validateStep(
+  step: string,
+  input: ReturnType<typeof useSelection>["input"],
+): string | null {
   switch (step) {
     case "/wizard/project":
       if (!input.tagNumber?.trim()) return "Enter a valve tag number to continue.";
@@ -50,7 +53,8 @@ function validateStep(step: string, input: ReturnType<typeof useSelection>["inpu
       if (!input.valveFunction) return "Select a valve function.";
       return null;
     case "/wizard/sizing":
-      if (!input.sizingFlow || !input.sizingDp) return "Enter flow and pressure drop to size the valve.";
+      if (!input.sizingFlow || !input.sizingDp)
+        return "Enter flow and pressure drop to size the valve.";
       return null;
     default:
       return null;
@@ -82,7 +86,9 @@ export function StepShell({ step, title, subtitle, children, aside }: StepShellP
       {/* Desktop layout */}
       <div className="hidden md:block space-y-6">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-primary">Selection Wizard</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-primary">
+            Selection Wizard
+          </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>
         </div>
@@ -91,7 +97,9 @@ export function StepShell({ step, title, subtitle, children, aside }: StepShellP
           <Card className="bg-gradient-surface shadow-elevated">
             <CardHeader>
               <CardTitle className="text-base">Inputs</CardTitle>
-              <CardDescription>Fill in what you know — defaults assumed where left blank.</CardDescription>
+              <CardDescription>
+                Fill in what you know — defaults assumed where left blank.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {children}

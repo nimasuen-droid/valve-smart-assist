@@ -36,8 +36,8 @@ export interface SelectionInput {
   // Valve body size — defaults to line size (pipeSize) when undefined
   valveSize?: string;
   // User overrides — empty/undefined means use engine recommendation
-  valveTypeOverride?: string;            // e.g. "Gate Valve" — must match an offered alternative or recommended
-  boreOverride?: "Full Bore" | "Reduced Bore" | "";  // ball valves only
+  valveTypeOverride?: string; // e.g. "Gate Valve" — must match an offered alternative or recommended
+  boreOverride?: "Full Bore" | "Reduced Bore" | ""; // ball valves only
   // Material overrides — empty/undefined means use engine recommendation
   bodyMaterialOverride?: string;
   bodyMaterialSpecOverride?: string;
@@ -89,11 +89,14 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
     if (hydrated) saveSelectionState(input);
   }, [input, hydrated]);
 
-  const value = useMemo<Ctx>(() => ({
-    input,
-    update: (patch) => setInput((s) => ({ ...s, ...patch })),
-    reset: () => setInput(DEFAULT),
-  }), [input]);
+  const value = useMemo<Ctx>(
+    () => ({
+      input,
+      update: (patch) => setInput((s) => ({ ...s, ...patch })),
+      reset: () => setInput(DEFAULT),
+    }),
+    [input],
+  );
 
   return <SelectionCtx.Provider value={value}>{children}</SelectionCtx.Provider>;
 }

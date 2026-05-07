@@ -4,7 +4,9 @@ const SAVED_KEY = "valve_saved_selections_v1";
 
 export function saveSelectionState(state) {
   if (typeof window === "undefined") return;
-  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {}
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  } catch {}
 }
 
 export function loadSelectionState() {
@@ -12,12 +14,16 @@ export function loadSelectionState() {
   try {
     const raw = localStorage.getItem(KEY);
     return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 export function clearSelectionState() {
   if (typeof window === "undefined") return;
-  try { localStorage.removeItem(KEY); } catch {}
+  try {
+    localStorage.removeItem(KEY);
+  } catch {}
 }
 
 export function listSavedSelections() {
@@ -25,7 +31,13 @@ export function listSavedSelections() {
   try {
     const raw = localStorage.getItem(SAVED_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
+}
+
+export function getSavedSelection(id) {
+  return listSavedSelections().find((s) => s.id === id) ?? null;
 }
 
 export function saveSelection(entry) {
@@ -33,11 +45,35 @@ export function saveSelection(entry) {
   const id = `S-${Date.now().toString(36).toUpperCase()}`;
   const withId = { id, savedAt: new Date().toISOString(), ...entry };
   list.unshift(withId);
-  try { localStorage.setItem(SAVED_KEY, JSON.stringify(list.slice(0, 50))); } catch {}
+  try {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(list.slice(0, 50)));
+  } catch {}
   return withId;
 }
 
 export function deleteSavedSelection(id) {
   const list = listSavedSelections().filter((s) => s.id !== id);
-  try { localStorage.setItem(SAVED_KEY, JSON.stringify(list)); } catch {}
+  try {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(list));
+  } catch {}
+}
+
+export function exportSelectionSnapshot(state, savedSelections = listSavedSelections()) {
+  return {
+    schema: "valve-smart-assist.selection-snapshot.v1",
+    exportedAt: new Date().toISOString(),
+    currentSelection: state,
+    savedSelections,
+  };
+}
+
+export function importSelectionSnapshot(snapshot) {
+  if (!snapshot || snapshot.schema !== "valve-smart-assist.selection-snapshot.v1") {
+    throw new Error("Unsupported selection snapshot format.");
+  }
+  if (snapshot.currentSelection) saveSelectionState(snapshot.currentSelection);
+  if (Array.isArray(snapshot.savedSelections)) {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(snapshot.savedSelections.slice(0, 50)));
+  }
+  return snapshot;
 }

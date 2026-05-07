@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { Children, cloneElement, isValidElement, ReactElement, ReactNode, useId } from "react";
 import { Label } from "@/components/ui/label";
 import { Info } from "lucide-react";
 
@@ -11,10 +11,24 @@ interface HelperFieldProps {
 }
 
 export function HelperField({ label, helper, htmlFor, reference, children }: HelperFieldProps) {
+  const generatedId = useId();
+  const controlId = htmlFor ?? `field-${generatedId}`;
+  const helperId = `${controlId}-helper`;
+  const enhancedChildren = Children.map(children, (child) => {
+    if (!isValidElement(child)) return child;
+    const props = child.props as Record<string, unknown>;
+    if (props["aria-label"] || props["aria-labelledby"]) return child;
+    return cloneElement(child as ReactElement<Record<string, unknown>>, {
+      id: props.id ?? controlId,
+      "aria-label": label,
+      "aria-describedby": props["aria-describedby"] ?? helperId,
+    });
+  });
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <Label htmlFor={htmlFor} className="text-sm font-medium">
+        <Label htmlFor={controlId} className="text-sm font-medium">
           {label}
         </Label>
         {reference && (
@@ -23,8 +37,10 @@ export function HelperField({ label, helper, htmlFor, reference, children }: Hel
           </span>
         )}
       </div>
-      {children}
-      <p className="text-xs leading-relaxed text-muted-foreground">{helper}</p>
+      {enhancedChildren}
+      <p id={helperId} className="text-xs leading-relaxed text-muted-foreground">
+        {helper}
+      </p>
     </div>
   );
 }

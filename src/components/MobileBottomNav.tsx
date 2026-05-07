@@ -3,10 +3,25 @@ import { Home, Workflow, Save, BookOpen, Settings } from "lucide-react";
 
 const TABS = [
   { url: "/", label: "Home", icon: Home, match: (p: string) => p === "/" },
-  { url: "/wizard/project", label: "Selection", icon: Workflow, match: (p: string) => p.startsWith("/wizard") || p === "/report" },
+  {
+    url: "/wizard/project",
+    label: "Selection",
+    icon: Workflow,
+    match: (p: string) => p.startsWith("/wizard") || p === "/report",
+  },
   { url: "/saved", label: "Saved", icon: Save, match: (p: string) => p.startsWith("/saved") },
-  { url: "/references", label: "Reference", icon: BookOpen, match: (p: string) => p.startsWith("/references") },
-  { url: "/settings", label: "Settings", icon: Settings, match: (p: string) => p.startsWith("/settings") },
+  {
+    url: "/references",
+    label: "Reference",
+    icon: BookOpen,
+    match: (p: string) => p.startsWith("/references"),
+  },
+  {
+    url: "/settings",
+    label: "Settings",
+    icon: Settings,
+    match: (p: string) => p.startsWith("/settings"),
+  },
 ];
 
 export function MobileBottomNav() {

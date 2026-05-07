@@ -19,7 +19,8 @@ function SpecialStep() {
 
   const toggle = (req: string, checked: boolean) => {
     const set = new Set(input.additionalRequirements);
-    if (checked) set.add(req); else set.delete(req);
+    if (checked) set.add(req);
+    else set.delete(req);
     update({ additionalRequirements: Array.from(set) });
   };
 
@@ -34,15 +35,18 @@ function SpecialStep() {
             <>
               <WhyCard>{result.rationale.requirements.reason}</WhyCard>
               <LearningMoment>
-                Special-service flags <strong>override defaults</strong>. Fire-safe (API 607/6FA) forces
-                metal secondary seats; sour service triggers NACE MR0175 hardness caps; cryogenic adds
-                extended bonnets; fugitive emissions (ISO 15848) drives low-emission packing. Each tick
-                tightens the material and design envelope — never treat them as optional.
+                Special-service flags <strong>override defaults</strong>. Fire-safe (API 607/6FA)
+                forces metal secondary seats; sour service triggers NACE MR0175 hardness caps;
+                cryogenic adds extended bonnets; fugitive emissions (ISO 15848) drives low-emission
+                packing. Each tick tightens the material and design envelope — never treat them as
+                optional.
               </LearningMoment>
             </>
           )}
           {result.warnings.slice(0, 4).map((w, i) => (
-            <WarningBanner key={i} title="Engineering caution">{w}</WarningBanner>
+            <WarningBanner key={i} title="Engineering caution">
+              {w}
+            </WarningBanner>
           ))}
           <ReferenceBubble standard="API 615" note="Special service & installation guidance." />
         </>

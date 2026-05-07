@@ -1,7 +1,13 @@
 import { useMemo } from "react";
 import { useSelection } from "./SelectionContext";
 import { selectValve } from "./valveSelectionEngine";
-import { checkAsmeB165Rating, recommendPressureClass } from "./asmeB165Ratings";
+import {
+  checkAsmeB1634BodyRating,
+  checkAsmeB165Rating,
+  getRatingSourceMetadata,
+  recommendPressureClass,
+  resolveMaterialRatingGroup,
+} from "./asmeB165Ratings";
 
 export interface RationaleEntry {
   reason: string;
@@ -42,22 +48,47 @@ export interface SelectionResult {
   warnings: string[];
   alternatives: { type: string; reason: string }[];
   rationale: Record<string, RationaleEntry>;
+  materialRatingGroup?: {
+    id: string;
+    label: string;
+    representativeMaterials: string[];
+    b165Table: string;
+    b1634Table: string;
+    dataset?: {
+      datasetId: string;
+      datasetVersion: string;
+      verificationStatus: string;
+      verificationStatusLabel: string;
+      releaseGate: string;
+    };
+  };
 }
 
 export interface AsmeCheck {
-  type: "pressure" | "material" | "caution";
+  type: "pressure" | "material" | "caution" | "ok";
+  ok?: boolean;
   warning: string;
-  maxAllowedPressure: number | null;
-  classMaxAtAmbient: number;
+  maxAllowedPressure?: number | null;
+  classMaxAtAmbient?: number;
   reference: string;
+  source?: {
+    groupId: string;
+    groupLabel: string;
+    representativeMaterials: string[];
+    b165Table: string;
+    b1634Table: string;
+    sourceNotes: string[];
+    preliminary: boolean;
+  };
 }
 
 export interface AsmeRec {
   recommendedClass: string;
-  maxAllowed: number;
-  factor: number;
+  maxAllowed: number | null;
+  factor: number | null;
   note: string;
   exceeded?: boolean;
+  source?: AsmeCheck["source"];
 }
 
 export function useSelectionResult() {
@@ -65,16 +96,43 @@ export function useSelectionResult() {
   return useMemo(() => {
     const engineResult = selectValve(input) as SelectionResult;
     const result = applyOverrides(engineResult, input);
+    const materialRatingGroup = resolveMaterialRatingGroup({
+      bodyMaterial: result.bodyMaterial,
+      bodyMaterialSpec: result.bodyMaterialSpec,
+    });
+    const materialRatingMetadata = getRatingSourceMetadata(materialRatingGroup);
+    const resultWithMetadata = {
+      ...result,
+      materialRatingGroup: { ...materialRatingGroup, dataset: materialRatingMetadata.dataset },
+    };
     const asmeWarning = checkAsmeB165Rating({
       pressureClass: "Class " + input.pressureClass.replace("#", ""),
       designTemp: input.designTemp,
       designPressure: input.designPressure,
+      bodyMaterial: result.bodyMaterial,
+      bodyMaterialSpec: result.bodyMaterialSpec,
     }) as AsmeCheck | null;
     const asmeRec = recommendPressureClass({
       designTemp: input.designTemp,
       designPressure: input.designPressure,
+      bodyMaterial: result.bodyMaterial,
+      bodyMaterialSpec: result.bodyMaterialSpec,
     }) as AsmeRec | null;
-    return { result, asmeWarning, asmeRec, input, engineResult };
+    const b1634Check = checkAsmeB1634BodyRating({
+      bodyMaterial: result.bodyMaterial,
+      bodyMaterialSpec: result.bodyMaterialSpec,
+      designTemp: input.designTemp,
+      pressureClass: input.pressureClass,
+    }) as AsmeCheck | null;
+    return {
+      result: resultWithMetadata,
+      asmeWarning,
+      asmeRec,
+      b1634Check,
+      materialRatingGroup: resultWithMetadata.materialRatingGroup,
+      input,
+      engineResult,
+    };
   }, [input]);
 }
 
@@ -96,7 +154,9 @@ function applyOverrides(res: SelectionResult, input: SelectionInputLite): Select
   let out = res;
   const typeOverride = input.valveTypeOverride?.trim();
   if (typeOverride && typeOverride !== res.valveType) {
-    const alt = res.alternatives?.find((a) => a.type === typeOverride || a.type.startsWith(typeOverride));
+    const alt = res.alternatives?.find(
+      (a) => a.type === typeOverride || a.type.startsWith(typeOverride),
+    );
     const note = alt
       ? `User override — originally rejected alternative selected. Engine recommended "${res.valveType}". Original rejection reason: ${alt.reason}`
       : `User override — manually selected "${typeOverride}" in place of engine recommendation "${res.valveType}". Verify suitability against process conditions.`;
@@ -121,7 +181,9 @@ function applyOverrides(res: SelectionResult, input: SelectionInputLite): Select
 
   const boreOverride = input.boreOverride;
   if (boreOverride && out.valveType.includes("Ball")) {
-    const cleanedSubtype = out.valveSubtype.replace(/\s+—\s+(Full Bore[^—]*|Reduced Bore[^—]*)$/i, "").trim();
+    const cleanedSubtype = out.valveSubtype
+      .replace(/\s+—\s+(Full Bore[^—]*|Reduced Bore[^—]*)$/i, "")
+      .trim();
     const newSubtype = `${cleanedSubtype} — ${boreOverride} (User Override)`;
     const overrideReason =
       boreOverride === "Full Bore"
@@ -130,7 +192,10 @@ function applyOverrides(res: SelectionResult, input: SelectionInputLite): Select
     out = {
       ...out,
       valveSubtype: newSubtype,
-      warnings: [`MANUAL OVERRIDE: Bore selection set to ${boreOverride} by user.`, ...out.warnings],
+      warnings: [
+        `MANUAL OVERRIDE: Bore selection set to ${boreOverride} by user.`,
+        ...out.warnings,
+      ],
       rationale: {
         ...out.rationale,
         bore: {
@@ -155,12 +220,19 @@ function applyOverrides(res: SelectionResult, input: SelectionInputLite): Select
   ];
   for (const [inputKey, resultKey, label] of matFields) {
     const v = (input as Record<string, unknown>)[inputKey as string];
-    if (typeof v === "string" && v.trim() && v !== (out as unknown as Record<string, string>)[resultKey as string]) {
+    if (
+      typeof v === "string" &&
+      v.trim() &&
+      v !== (out as unknown as Record<string, string>)[resultKey as string]
+    ) {
       const original = (out as unknown as Record<string, string>)[resultKey as string];
       out = {
         ...out,
         [resultKey]: v,
-        warnings: [`MANUAL OVERRIDE: ${label} changed from "${original}" to "${v}". Engineering review required.`, ...out.warnings],
+        warnings: [
+          `MANUAL OVERRIDE: ${label} changed from "${original}" to "${v}". Engineering review required.`,
+          ...out.warnings,
+        ],
       } as SelectionResult;
     }
   }

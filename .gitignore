@@ -16,6 +16,11 @@ dist-ssr
 .nitro
 *.local
 
+# Local release/test artifacts
+.release-smoke-profile-*
+e2e-report-*.png
+release-audit-report.png
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

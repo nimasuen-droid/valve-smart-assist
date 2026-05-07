@@ -38,7 +38,8 @@ export const SAMPLE_CASES: SampleCase[] = [
       "Hazardous Area (ATEX / IECEx)",
       "Low Emission (Fugitive Emissions)",
     ],
-    notes: "Topside HP produced gas isolation downstream of inlet separator. Fire-safe and ESD ready.",
+    notes:
+      "Topside HP produced gas isolation downstream of inlet separator. Fire-safe and ESD ready.",
   },
   {
     caseTitle: "Crude oil export pipeline valve",
@@ -59,11 +60,9 @@ export const SAMPLE_CASES: SampleCase[] = [
     operatingPressure: "70",
     operatingTemp: "45",
     flowCondition: "Continuous, piggable line",
-    additionalRequirements: [
-      "Piggable Line (Full Bore Required)",
-      "Bidirectional Sealing",
-    ],
-    notes: "Crude export trunk line block valve. Full-bore trunnion ball, double block & bleed capable.",
+    additionalRequirements: ["Piggable Line (Full Bore Required)", "Bidirectional Sealing"],
+    notes:
+      "Crude export trunk line block valve. Full-bore trunnion ball, double block & bleed capable.",
   },
   {
     caseTitle: "Condensate drain valve",
@@ -106,10 +105,7 @@ export const SAMPLE_CASES: SampleCase[] = [
     operatingPressure: "22",
     operatingTemp: "35",
     flowCondition: "Continuous",
-    additionalRequirements: [
-      "Hazardous Area (ATEX / IECEx)",
-      "Low Emission (Fugitive Emissions)",
-    ],
+    additionalRequirements: ["Hazardous Area (ATEX / IECEx)", "Low Emission (Fugitive Emissions)"],
     notes: "Manual block valve at gas turbine fuel gas inlet. Fire-safe required.",
   },
   {
@@ -117,7 +113,7 @@ export const SAMPLE_CASES: SampleCase[] = [
     projectName: "Jubail Utilities Expansion",
     clientName: "SABIC Utilities",
     areaUnit: "Unit 900 — IA Distribution",
-    lineNumber: '1\"-IA-902-U1U',
+    lineNumber: '1"-IA-902-U1U',
     tagNumber: "HV-9024",
     pipeSize: '1"',
     pressureClass: "150#",
@@ -176,7 +172,8 @@ export const SAMPLE_CASES: SampleCase[] = [
     operatingTemp: "35",
     flowCondition: "Static, ready-to-flow",
     additionalRequirements: ["Bidirectional Sealing"],
-    notes: "Firewater ring main sectionalising valve. Locked open, gear operated, position indicator.",
+    notes:
+      "Firewater ring main sectionalising valve. Locked open, gear operated, position indicator.",
   },
   {
     caseTitle: "HP steam isolation valve",
@@ -246,7 +243,8 @@ export const SAMPLE_CASES: SampleCase[] = [
       "Low Emission (Fugitive Emissions)",
       "Hazardous Area (ATEX / IECEx)",
     ],
-    notes: "Sour gas manifold ESD valve. NACE MR0175, fire-safe API 607, fugitive emission ISO 15848-1.",
+    notes:
+      "Sour gas manifold ESD valve. NACE MR0175, fire-safe API 607, fugitive emission ISO 15848-1.",
   },
   {
     caseTitle: "Slurry / dirty liquid service valve",
@@ -289,11 +287,9 @@ export const SAMPLE_CASES: SampleCase[] = [
     operatingPressure: "1",
     operatingTemp: "60",
     flowCondition: "Static, ready-to-flow on relief",
-    additionalRequirements: [
-      "Hazardous Area (ATEX / IECEx)",
-      "Low Emission (Fugitive Emissions)",
-    ],
-    notes: "Car-sealed-open block valve at PSV inlet. Full bore gate, locked open, API 526 compatible.",
+    additionalRequirements: ["Hazardous Area (ATEX / IECEx)", "Low Emission (Fugitive Emissions)"],
+    notes:
+      "Car-sealed-open block valve at PSV inlet. Full bore gate, locked open, API 526 compatible.",
   },
 ];
 

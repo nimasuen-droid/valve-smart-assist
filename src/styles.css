@@ -110,27 +110,57 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01", "tnum";
   }
-  h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
-  h2 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.015em; }
-  h3 { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; }
-  h4 { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.005em; }
-  label, .text-label {
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  h3 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  label,
+  .text-label {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 500;
   }
-  code, kbd, samp, pre, .font-mono, .tabular-nums {
+  code,
+  kbd,
+  samp,
+  pre,
+  .font-mono,
+  .tabular-nums {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
 }
 
 @layer utilities {
-  .bg-gradient-surface { background: var(--gradient-surface); }
-  .bg-gradient-accent { background: var(--gradient-accent); }
-  .shadow-elevated { box-shadow: var(--shadow-elevated); }
-  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .bg-gradient-surface {
+    background: var(--gradient-surface);
+  }
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
   .grid-bg {
     background-image:
       linear-gradient(oklch(0.3 0.025 240 / 0.4) 1px, transparent 1px),

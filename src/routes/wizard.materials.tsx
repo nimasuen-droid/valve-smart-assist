@@ -99,10 +99,12 @@ const OPTIONS = {
 } as const;
 
 function MaterialsStep() {
-  const { result, engineResult } = useSelectionResult();
+  const { result, engineResult, b1634Check, materialRatingGroup } = useSelectionResult();
   const refs = [
     ...(result.rationale.bodyMaterial?.refs || []),
     ...(result.rationale.trim?.refs || []),
+    materialRatingGroup?.b165Table,
+    materialRatingGroup?.b1634Table,
   ];
   const bodyReason = result.rationale.bodyMaterial?.reason;
   const trimReason = result.rationale.trim?.reason;
@@ -117,35 +119,65 @@ function MaterialsStep() {
           {bodyReason && (
             <>
               <WhyCard>
-                <p className="mb-2"><strong className="text-foreground">Body: </strong>{bodyReason}</p>
+                <p className="mb-2">
+                  <strong className="text-foreground">Body: </strong>
+                  {bodyReason}
+                </p>
               </WhyCard>
               <LearningMoment>
-                Body material is set by <strong>fluid + temperature</strong>: WCB carbon steel covers most
-                hydrocarbons from −29 °C to 425 °C; LCC/LCB for low-temp service; CF8M (316SS) for corrosives
-                and cryogenic; chrome-moly (WC6/WC9) above 425 °C. Sour service adds NACE MR0175/ISO 15156 hardness limits.
+                Body material is set by <strong>fluid + temperature</strong>: WCB carbon steel
+                covers most hydrocarbons from −29 °C to 425 °C; LCC/LCB for low-temp service; CF8M
+                (316SS) for corrosives and cryogenic; chrome-moly (WC6/WC9) above 425 °C. Sour
+                service adds NACE MR0175/ISO 15156 hardness limits.
               </LearningMoment>
             </>
           )}
           {trimReason && (
             <WhyCard>
-              <p><strong className="text-foreground">Trim: </strong>{trimReason}</p>
+              <p>
+                <strong className="text-foreground">Trim: </strong>
+                {trimReason}
+              </p>
             </WhyCard>
           )}
-          {Array.from(new Set(refs)).slice(0, 4).map((ref) => (
-            <ReferenceBubble key={ref} standard={ref.split(/[(§]/)[0].trim()} note={ref} />
-          ))}
+          {materialRatingGroup && (
+            <LearningMoment title="Rating basis">
+              <strong>{materialRatingGroup.label}</strong> selected from the body material and ASTM
+              grade. B16.5 pressure class is screened against {materialRatingGroup.b165Table}; valve
+              body material suitability is screened against {materialRatingGroup.b1634Table}.
+            </LearningMoment>
+          )}
+          {b1634Check && (
+            <WhyCard>
+              <p>
+                <strong className="text-foreground">ASME B16.34 body check: </strong>
+                {b1634Check.warning}
+              </p>
+            </WhyCard>
+          )}
+          {Array.from(new Set(refs))
+            .filter(Boolean)
+            .slice(0, 4)
+            .map((ref) => (
+              <ReferenceBubble key={ref} standard={ref.split(/[(§]/)[0].trim()} note={ref} />
+            ))}
         </>
       }
     >
       <Card>
         <CardContent className="space-y-5 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Body</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Body
+          </p>
           <OverrideField
             label="Body material"
             recommended={engineResult.bodyMaterial}
             overrideKey="bodyMaterialOverride"
             options={[...OPTIONS.bodyMaterialOverride]}
-            reasoning={bodyReason || "Based on fluid, temperature and pressure class per ASME B16.34 / API 615."}
+            reasoning={
+              bodyReason ||
+              "Based on fluid, temperature and pressure class per ASME B16.34 / API 615."
+            }
             warning="Selected material may not meet design temperature, pressure or service compatibility. Re-check P-T rating and corrosion allowance."
           />
           <OverrideField
@@ -160,13 +192,18 @@ function MaterialsStep() {
       </Card>
       <Card>
         <CardContent className="space-y-5 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trim</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Trim
+          </p>
           <OverrideField
             label="Seat material"
             recommended={engineResult.seatMaterial}
             overrideKey="seatMaterialOverride"
             options={[...OPTIONS.seatMaterialOverride]}
-            reasoning={trimReason || "Soft seats (PTFE/PEEK) for tight shutoff at moderate temperatures; metal seats for high-temp / abrasive service."}
+            reasoning={
+              trimReason ||
+              "Soft seats (PTFE/PEEK) for tight shutoff at moderate temperatures; metal seats for high-temp / abrasive service."
+            }
             warning="Check seat temperature limit and shutoff class against design conditions."
           />
           <OverrideField
@@ -189,7 +226,9 @@ function MaterialsStep() {
       </Card>
       <Card>
         <CardContent className="space-y-5 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sealing</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Sealing
+          </p>
           <OverrideField
             label="Gasket"
             recommended={engineResult.gasket}

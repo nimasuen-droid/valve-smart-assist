@@ -9,7 +9,11 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "node scripts/release-data-check.mjs",
+    "test:e2e": "node scripts/release-e2e-smoke.mjs",
+    "test:a11y": "node scripts/release-a11y-check.mjs",
+    "release:check": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Valve Selection Guide">
+  <rect width="512" height="512" rx="96" fill="#142033" />
+  <path d="M88 160h336v72H88z" fill="#57d3f7" />
+  <path d="M160 96h192v320H160z" fill="#1e3148" stroke="#57d3f7" stroke-width="28" />
+  <path d="M136 208 256 96l120 112-120 112z" fill="#f1bd43" />
+  <path d="M136 304h240v72H136z" fill="#57d3f7" />
+  <circle cx="256" cy="256" r="42" fill="#142033" stroke="#f8fafc" stroke-width="18" />
+</svg>

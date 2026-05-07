@@ -13,14 +13,15 @@ export const Route = createFileRoute("/wizard/function")({
 });
 
 const DESCRIPTIONS: Record<string, string> = {
-  "Isolation (On/Off)": "Block flow with tight shut-off — primary use case for ball, gate and butterfly.",
+  "Isolation (On/Off)":
+    "Block flow with tight shut-off — primary use case for ball, gate and butterfly.",
   "Throttling / Control": "Modulate flow or pressure — globe, V-port ball or TOV.",
   "Non-Return (Check)": "Prevent reverse flow — swing, dual-plate or piston check.",
   "Pressure Relief / Safety": "PSV / PRV — opens on overpressure per API 520/521.",
-  "Blowdown": "Rapid emergency depressurisation to flare. Fire-safe ball.",
-  "Sampling": "Small-bore sampling connection.",
-  "Drain": "Small-bore drain connection.",
-  "Vent": "Small-bore vent connection.",
+  Blowdown: "Rapid emergency depressurisation to flare. Fire-safe ball.",
+  Sampling: "Small-bore sampling connection.",
+  Drain: "Small-bore drain connection.",
+  Vent: "Small-bore vent connection.",
 };
 
 function FunctionStep() {
@@ -33,10 +34,13 @@ function FunctionStep() {
       aside={
         <>
           <GuidanceCard title="Pick the dominant duty">
-            A valve can have more than one role, but design for the dominant function. Combined isolation
-            + throttling almost always degrades shut-off — split into two valves.
+            A valve can have more than one role, but design for the dominant function. Combined
+            isolation + throttling almost always degrades shut-off — split into two valves.
           </GuidanceCard>
-          <ReferenceBubble standard="API 615" note="§6 — selection by valve function and service." />
+          <ReferenceBubble
+            standard="API 615"
+            note="§6 — selection by valve function and service."
+          />
         </>
       }
     >

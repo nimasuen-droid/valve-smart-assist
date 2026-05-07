@@ -4,7 +4,13 @@ import { HelperField } from "@/components/HelperField";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { GuidanceCard, ReferenceBubble } from "@/components/InfoCards";
 import { useSelection } from "@/lib/SelectionContext";
 import { pickRandomSample } from "@/lib/sampleCases";
@@ -26,8 +32,14 @@ function ProjectStep() {
   const { input, update, reset } = useSelection();
 
   const hasUserData = !!(
-    input.projectName || input.tagNumber || input.lineNumber || input.clientName ||
-    input.areaUnit || input.notes || input.operatingPressure || input.operatingTemp
+    input.projectName ||
+    input.tagNumber ||
+    input.lineNumber ||
+    input.clientName ||
+    input.areaUnit ||
+    input.notes ||
+    input.operatingPressure ||
+    input.operatingTemp
   );
 
   const clearAll = () => {
@@ -81,11 +93,17 @@ function ProjectStep() {
       aside={
         <>
           <GuidanceCard title="Why we ask">
-            Project and tag traceability is required on every engineering deliverable. The tag number drives
-            the datasheet number on export.
+            Project and tag traceability is required on every engineering deliverable. The tag
+            number drives the datasheet number on export.
           </GuidanceCard>
-          <ReferenceBubble standard="API 615" note="Recommended practice for valve selection in process plants." />
-          <ReferenceBubble standard="ASME B31.3" note="Process piping — design pressure, temperature & material basis." />
+          <ReferenceBubble
+            standard="API 615"
+            note="Recommended practice for valve selection in process plants."
+          />
+          <ReferenceBubble
+            standard="ASME B31.3"
+            note="Process piping — design pressure, temperature & material basis."
+          />
         </>
       }
     >
@@ -116,57 +134,118 @@ function ProjectStep() {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <HelperField label="Project name" helper="Free-text identifier shown on the datasheet cover.">
-          <Input value={input.projectName} onChange={(e) => u({ projectName: e.target.value })} placeholder="e.g. North Sea Compression Upgrade" />
+        <HelperField
+          label="Project name"
+          helper="Free-text identifier shown on the datasheet cover."
+        >
+          <Input
+            value={input.projectName}
+            onChange={(e) => u({ projectName: e.target.value })}
+            placeholder="e.g. North Sea Compression Upgrade"
+          />
         </HelperField>
         <HelperField label="Client name" helper="End client / operator on the title block.">
-          <Input value={input.clientName ?? ""} onChange={(e) => u({ clientName: e.target.value })} placeholder="e.g. NorthOil A/S" />
+          <Input
+            value={input.clientName ?? ""}
+            onChange={(e) => u({ clientName: e.target.value })}
+            placeholder="e.g. NorthOil A/S"
+          />
         </HelperField>
         <HelperField label="Area / Unit" helper="Process area or unit reference.">
-          <Input value={input.areaUnit ?? ""} onChange={(e) => u({ areaUnit: e.target.value })} placeholder="e.g. Unit 200 — HP Compression" />
+          <Input
+            value={input.areaUnit ?? ""}
+            onChange={(e) => u({ areaUnit: e.target.value })}
+            placeholder="e.g. Unit 200 — HP Compression"
+          />
         </HelperField>
         <HelperField label="Line number" helper="Per piping line list / P&ID." reference="P&ID">
-          <Input value={input.lineNumber ?? ""} onChange={(e) => u({ lineNumber: e.target.value })} placeholder='e.g. 8"-PG-201-A1A' />
+          <Input
+            value={input.lineNumber ?? ""}
+            onChange={(e) => u({ lineNumber: e.target.value })}
+            placeholder='e.g. 8"-PG-201-A1A'
+          />
         </HelperField>
-        <HelperField label="Valve tag number" helper="Unique tag per P&ID — appears as DS-{tag} on export." reference="P&ID">
-          <Input value={input.tagNumber} onChange={(e) => u({ tagNumber: e.target.value })} placeholder="e.g. XV-1042" />
+        <HelperField
+          label="Valve tag number"
+          helper="Unique tag per P&ID — appears as DS-{tag} on export."
+          reference="P&ID"
+        >
+          <Input
+            value={input.tagNumber}
+            onChange={(e) => u({ tagNumber: e.target.value })}
+            placeholder="e.g. XV-1042"
+          />
         </HelperField>
         <HelperField label="Line class" helper="Piping line class spec.">
-          <Input value={input.lineClass ?? ""} onChange={(e) => u({ lineClass: e.target.value })} placeholder="e.g. A1A — CS, Class 600" />
+          <Input
+            value={input.lineClass ?? ""}
+            onChange={(e) => u({ lineClass: e.target.value })}
+            placeholder="e.g. A1A — CS, Class 600"
+          />
         </HelperField>
 
         <HelperField label="Pipe size (NPS)" helper="Nominal pipe size of the line.">
           <Select value={input.pipeSize} onValueChange={(v) => u({ pipeSize: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {PIPE_SIZES.map((s: string) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {PIPE_SIZES.map((s: string) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </HelperField>
 
         <HelperField label="Pressure class" helper="ASME pressure class.">
           <Select value={input.pressureClass} onValueChange={(v) => u({ pressureClass: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {PRESSURE_CLASSES.map((s: string) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {PRESSURE_CLASSES.map((s: string) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </HelperField>
 
-        <HelperField label="Installation location" helper="Drives material & coating recommendations.">
-          <Select value={input.installationLocation} onValueChange={(v) => u({ installationLocation: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+        <HelperField
+          label="Installation location"
+          helper="Drives material & coating recommendations."
+        >
+          <Select
+            value={input.installationLocation}
+            onValueChange={(v) => u({ installationLocation: v })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {INSTALLATION_LOCATIONS.map((s: string) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {INSTALLATION_LOCATIONS.map((s: string) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </HelperField>
 
         <HelperField label="Valve function" helper="What the valve must do in service.">
           <Select value={input.valveFunction} onValueChange={(v) => u({ valveFunction: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {VALVE_FUNCTIONS.map((s: string) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {VALVE_FUNCTIONS.map((s: string) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </HelperField>
