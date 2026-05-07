@@ -66,6 +66,11 @@ export const Route = createRootRoute({
           "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/68f5658b-2332-4b06-a073-14fb6e57f014/id-preview-e1f275a7--31c54872-770e-4f9c-9043-13080de33216.lovable.app-1777763673028.png",
       },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "description", content: "A decision-support web app that helps piping & process engineers screen the right industrial valve for a given service." },
+      { property: "og:description", content: "A decision-support web app that helps piping & process engineers screen the right industrial valve for a given service." },
+      { name: "twitter:description", content: "A decision-support web app that helps piping & process engineers screen the right industrial valve for a given service." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c94f89df-b580-4a3b-8ec5-eec8d61abce3" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c94f89df-b580-4a3b-8ec5-eec8d61abce3" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
