@@ -103,9 +103,15 @@ function Dashboard() {
               asChild
               size="lg"
               className="bg-gradient-accent text-primary-foreground shadow-glow hover:opacity-95"
+              data-onboarding="start-selection"
             >
               <Link to="/wizard/project">
                 <Play className="h-4 w-4" /> Start Selection
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="secondary">
+              <Link to="/manual">
+                <BookOpen className="h-4 w-4" /> Read User Manual
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
@@ -118,7 +124,7 @@ function Dashboard() {
       </section>
 
       {/* Quick workflow */}
-      <section className="grid gap-4 md:grid-cols-4">
+      <section data-onboarding="quick-workflow" className="grid gap-4 md:grid-cols-4">
         {[
           {
             icon: Play,

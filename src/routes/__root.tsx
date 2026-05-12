@@ -8,6 +8,10 @@ import { WarningBanner } from "@/components/InfoCards";
 import { Toaster } from "@/components/ui/sonner";
 import { SelectionProvider } from "@/lib/SelectionContext";
 import { APP_GOVERNANCE, USER_RESPONSIBILITY_NOTICE } from "@/lib/governance";
+import { EulaGate } from "@/components/EulaGate";
+import { OnboardingTour, useOnboarding } from "@/components/OnboardingTour";
+import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
 
 function NotFoundComponent() {
   return (
@@ -125,6 +129,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const onboarding = useOnboarding();
+
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
@@ -142,38 +148,57 @@ function RootComponent() {
 
   return (
     <SelectionProvider>
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full bg-background grid-bg">
-          <div className="hidden md:block">
-            <AppSidebar />
+      <EulaGate>
+        <SidebarProvider>
+          <div className="flex min-h-screen w-full bg-background grid-bg">
+            <div data-onboarding="nav" className="hidden md:block">
+              <AppSidebar />
+            </div>
+            <div className="flex flex-1 flex-col">
+              <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+                <div className="hidden md:block">
+                  <SidebarTrigger />
+                </div>
+                <div className="flex flex-col">
+                  <div className="text-sm font-semibold leading-tight">Valve Selection Guide</div>
+                  <p className="text-[11px] leading-tight text-muted-foreground">
+                    Practical valve selection support for process piping applications
+                  </p>
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                  <div className="hidden items-center gap-2 text-xs text-muted-foreground md:flex">
+                    <span className="inline-block h-2 w-2 rounded-full bg-success" />
+                    {APP_GOVERNANCE.defaultReadiness} | verify with qualified engineer
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    data-onboarding="help"
+                    onClick={onboarding.start}
+                    className="h-9"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">How to Use</span>
+                  </Button>
+                </div>
+              </header>
+              <main
+                data-onboarding="main"
+                className="flex-1 space-y-4 p-4 pb-24 md:space-y-6 md:p-8 md:pb-8"
+              >
+                <Outlet />
+                <WarningBanner title={APP_GOVERNANCE.classification}>
+                  {USER_RESPONSIBILITY_NOTICE}
+                </WarningBanner>
+              </main>
+            </div>
+            <MobileBottomNav />
           </div>
-          <div className="flex flex-1 flex-col">
-            <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
-              <div className="hidden md:block">
-                <SidebarTrigger />
-              </div>
-              <div className="flex flex-col">
-                <div className="text-sm font-semibold leading-tight">Valve Selection Guide</div>
-                <p className="text-[11px] leading-tight text-muted-foreground">
-                  Practical valve selection support for process piping applications
-                </p>
-              </div>
-              <div className="ml-auto hidden items-center gap-2 text-xs text-muted-foreground md:flex">
-                <span className="inline-block h-2 w-2 rounded-full bg-success" />
-                {APP_GOVERNANCE.defaultReadiness} | verify with qualified engineer
-              </div>
-            </header>
-            <main className="flex-1 space-y-4 p-4 pb-24 md:space-y-6 md:p-8 md:pb-8">
-              <Outlet />
-              <WarningBanner title={APP_GOVERNANCE.classification}>
-                {USER_RESPONSIBILITY_NOTICE}
-              </WarningBanner>
-            </main>
-          </div>
-          <MobileBottomNav />
-        </div>
-        <Toaster />
-      </SidebarProvider>
+          <OnboardingTour open={onboarding.open} onClose={onboarding.close} />
+          <Toaster />
+        </SidebarProvider>
+      </EulaGate>
     </SelectionProvider>
   );
 }

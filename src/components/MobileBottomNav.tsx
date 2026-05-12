@@ -28,6 +28,7 @@ export function MobileBottomNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav
+      data-onboarding="nav"
       className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
