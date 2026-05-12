@@ -165,6 +165,7 @@ try {
     ["/wizard/ends", "End Connection"],
     ["/wizard/special", "Special Service"],
     ["/report", "Recommendation Report"],
+    ["/reports", "Report Library"],
     ["/saved", "Saved Selections"],
     ["/references", "Reference Library"],
     ["/manual", "User Manual"],

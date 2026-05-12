@@ -128,6 +128,136 @@ function TypeStep() {
         </CardContent>
       </Card>
 
+      {engineResult.alternatives?.length > 0 && (
+        <Card
+          className={
+            isOverridden ? "border-warning/50 bg-warning/5" : "border-success/40 bg-success/5"
+          }
+        >
+          <CardContent className="space-y-3 p-4">
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Valve Type Override
+              </Label>
+              {isOverridden ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-warning">
+                  <AlertTriangle className="h-3 w-3" /> Override active
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-success">
+                  <Star className="h-3 w-3 fill-success text-success" /> Linked to valve type
+                </span>
+              )}
+            </div>
+
+            <div className="grid gap-2 rounded-md border border-border/70 bg-background/60 p-3 sm:grid-cols-2">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Recommended
+                </p>
+                <p className="break-words font-medium text-foreground">
+                  {engineResult.valveType || "-"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Selected
+                </p>
+                <p
+                  className={`break-words font-medium ${
+                    isOverridden ? "text-warning" : "text-foreground"
+                  }`}
+                >
+                  {result.valveType || engineResult.valveType || "-"}
+                </p>
+              </div>
+            </div>
+
+            {!typeUnlocked && !isOverridden ? (
+              <button
+                type="button"
+                onClick={() => setTypeUnlocked(true)}
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline"
+              >
+                <Unlock className="h-3 w-3" /> Override valve type - see alternatives
+              </button>
+            ) : (
+              <div className="space-y-3 rounded-md border border-warning/30 bg-warning/5 p-3">
+                <p className="text-[11px] text-warning">
+                  Manual override should be based on project specification, applicable codes,
+                  service conditions, or engineering judgment.
+                </p>
+                <div className="space-y-2">
+                  {engineResult.alternatives.map((a, i) => {
+                    const selected = input.valveTypeOverride === a.type;
+                    return (
+                      <Card
+                        key={i}
+                        className={`cursor-pointer transition-colors ${
+                          selected
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card hover:bg-muted/40"
+                        }`}
+                        onClick={() => selectType(a.type)}
+                      >
+                        <CardContent className="flex gap-3 p-3">
+                          {selected ? (
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                          ) : (
+                            <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-sm font-medium">{a.type}</p>
+                              {selected && (
+                                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground">{a.reason}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+                <div>
+                  <label className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    Override reason {isOverridden && <span className="text-destructive">*</span>}
+                  </label>
+                  <Textarea
+                    value={typeReason}
+                    onChange={(e) => setReason("valveTypeOverride", e.target.value)}
+                    placeholder="e.g. Client spec, vendor availability, operability, plant standardisation"
+                    className="min-h-[60px] text-xs"
+                  />
+                  {isOverridden && !typeReason.trim() && (
+                    <p className="mt-1 text-[11px] text-destructive">
+                      A justification is required for traceability.
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center justify-end pt-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-xs"
+                    onClick={() => {
+                      update({ valveTypeOverride: "" });
+                      setReason("valveTypeOverride", "");
+                      setTypeUnlocked(false);
+                    }}
+                  >
+                    <Lock className="h-3 w-3" /> Use recommended ({engineResult.valveType})
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* ASME B16.5 P-T check + pressure class override */}
       {(() => {
         const isCritical =
@@ -372,109 +502,6 @@ function TypeStep() {
                     }}
                   >
                     <Lock className="h-3 w-3" /> Use recommended
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {engineResult.alternatives?.length > 0 && (
-        <Card>
-          <CardContent className="space-y-3 p-4">
-            <div className="flex items-center justify-between gap-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Valve type
-              </Label>
-              {isOverridden ? (
-                <span className="inline-flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-warning">
-                  <AlertTriangle className="h-3 w-3" /> Override active
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-success">
-                  <Star className="h-3 w-3 fill-success text-success" /> Recommended
-                </span>
-              )}
-            </div>
-
-            {!typeUnlocked && !isOverridden ? (
-              <button
-                type="button"
-                onClick={() => setTypeUnlocked(true)}
-                className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline"
-              >
-                <Unlock className="h-3 w-3" /> Override recommendation — see alternatives
-              </button>
-            ) : (
-              <div className="space-y-3 rounded-md border border-warning/30 bg-warning/5 p-3">
-                <p className="text-[11px] text-warning">
-                  Manual override should be based on project specification, applicable codes,
-                  service conditions, or engineering judgment.
-                </p>
-                <div className="space-y-2">
-                  {engineResult.alternatives.map((a, i) => {
-                    const selected = input.valveTypeOverride === a.type;
-                    return (
-                      <Card
-                        key={i}
-                        className={`cursor-pointer transition-colors ${
-                          selected
-                            ? "border-primary bg-primary/10"
-                            : "border-border bg-card hover:bg-muted/40"
-                        }`}
-                        onClick={() => selectType(a.type)}
-                      >
-                        <CardContent className="flex gap-3 p-3">
-                          {selected ? (
-                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                          ) : (
-                            <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-                          )}
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="text-sm font-medium">{a.type}</p>
-                              {selected && (
-                                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-                                  Selected
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground">{a.reason}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-                <div>
-                  <label className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                    Override reason {isOverridden && <span className="text-destructive">*</span>}
-                  </label>
-                  <Textarea
-                    value={typeReason}
-                    onChange={(e) => setReason("valveTypeOverride", e.target.value)}
-                    placeholder="e.g. Client spec, vendor availability, operability, plant standardisation"
-                    className="min-h-[60px] text-xs"
-                  />
-                  {isOverridden && !typeReason.trim() && (
-                    <p className="mt-1 text-[11px] text-destructive">
-                      A justification is required for traceability.
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center justify-end pt-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-7 text-xs"
-                    onClick={() => {
-                      update({ valveTypeOverride: "" });
-                      setReason("valveTypeOverride", "");
-                      setTypeUnlocked(false);
-                    }}
-                  >
-                    <Lock className="h-3 w-3" /> Use recommended ({engineResult.valveType})
                   </Button>
                 </div>
               </div>

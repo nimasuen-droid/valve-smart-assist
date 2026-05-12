@@ -18,6 +18,7 @@ import {
   ChevronDown,
   Star,
   AlertTriangle,
+  Archive,
 } from "lucide-react";
 import {
   Select,
@@ -31,13 +32,19 @@ import { GovernanceBanner } from "@/components/GovernanceNotice";
 import { PRESSURE_CLASSES, PIPE_SIZES } from "@/lib/valveSelectionEngine";
 import { useSelectionResult } from "@/lib/useSelectionResult";
 import { useSelection } from "@/lib/SelectionContext";
-import { saveSelection } from "@/lib/selectionState";
+import { saveReport, saveSelection } from "@/lib/selectionState";
 import { getIssueReadinessStatus, getOverrideIssues } from "@/lib/issueReadiness";
 import { runSizing, evaluateAgainstValve } from "@/lib/sizing";
 import { APP_GOVERNANCE, USER_RESPONSIBILITY_NOTICE } from "@/lib/governance";
 import { toast } from "sonner";
 // @ts-expect-error - datasheetUtils is a JS module
-import { generatePdfHtml, exportDatasheetToExcel, safeExportFilename } from "@/lib/datasheetUtils";
+import {
+  generatePdfHtml,
+  generateProfessionalEpcDatasheetHtml,
+  generateSelectionReviewHtml,
+  exportDatasheetToExcel,
+  safeExportFilename,
+} from "@/lib/datasheetUtils";
 
 function MSection({
   title,
@@ -351,6 +358,97 @@ function ReportPage() {
     ratingDataset?.verificationStatus === "USER_APPROVED"
       ? `${ratingDataset.datasetVersion}; user-approved licensed table set.`
       : `${ratingDataset?.datasetVersion ?? "Bundled draft"}; draft screening basis only - verify against licensed/current ASME tables.`;
+  const valveTypeChoices = useMemo(() => {
+    const choices = [
+      { value: engineResult.valveType, label: `${engineResult.valveType} (engine)` },
+    ];
+    for (const alternative of engineResult.alternatives ?? []) {
+      if (alternative.type && !choices.some((choice) => choice.value === alternative.type)) {
+        choices.push({ value: alternative.type, label: alternative.type });
+      }
+    }
+    return choices;
+  }, [engineResult.alternatives, engineResult.valveType]);
+
+  const reviewReportHtml = useMemo(
+    () =>
+      generateSelectionReviewHtml({
+        input,
+        result,
+        engineResult,
+        asmeRec,
+        asmeWarning,
+        b1634Check,
+        materialRatingGroup,
+        sizing,
+        overrideIssues,
+        issueStatus: issueReadiness.status,
+        generatedAt,
+      }) as string,
+    [
+      input,
+      result,
+      engineResult,
+      asmeRec,
+      asmeWarning,
+      b1634Check,
+      materialRatingGroup,
+      sizing,
+      overrideIssues,
+      issueReadiness.status,
+      generatedAt,
+    ],
+  );
+
+  const epcDatasheetHtml = useMemo(
+    () =>
+      generateProfessionalEpcDatasheetHtml({
+        input,
+        result,
+        engineResult,
+        asmeRec,
+        asmeWarning,
+        b1634Check,
+        materialRatingGroup,
+        sizing,
+        overrideIssues,
+        issueStatus: issueReadiness.status,
+        generatedAt,
+      }) as string,
+    [
+      input,
+      result,
+      engineResult,
+      asmeRec,
+      asmeWarning,
+      b1634Check,
+      materialRatingGroup,
+      sizing,
+      overrideIssues,
+      issueReadiness.status,
+      generatedAt,
+    ],
+  );
+
+  const downloadHtmlFile = (html: string, filename: string) => {
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const printHtml = (html: string) => {
+    const w = window.open("", "_blank", "noopener,noreferrer");
+    if (w) {
+      w.opener = null;
+      w.document.write(html);
+      w.document.close();
+      setTimeout(() => w.print(), 400);
+    }
+  };
 
   const guardIssueAction = (actionName: string, fn: () => void) => {
     if (!issueReadiness.canIssue) {
@@ -364,25 +462,53 @@ function ReportPage() {
 
   const exportPdf = () => {
     guardIssueAction("Export PDF", () => {
-      const w = window.open("", "_blank", "noopener,noreferrer");
-      if (w) {
-        w.opener = null;
-        w.document.write(datasheetHtml);
-        w.document.close();
-        setTimeout(() => w.print(), 400);
-      }
+      printHtml(datasheetHtml);
     });
   };
 
   const downloadHtml = () => {
     guardIssueAction("Download HTML", () => {
-      const blob = new Blob([datasheetHtml], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `ValveDatasheet_${safeExportFilename(input.tagNumber, "draft")}.html`;
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadHtmlFile(
+        datasheetHtml,
+        `ValveDatasheet_${safeExportFilename(input.tagNumber, "draft")}.html`,
+      );
+    });
+  };
+
+  const downloadReviewReport = () => {
+    downloadHtmlFile(
+      reviewReportHtml,
+      `SelectionReviewReport_${safeExportFilename(input.tagNumber, "draft")}.html`,
+    );
+  };
+
+  const saveReviewReport = () => {
+    const saved = saveReport({
+      title: "Selection Review Report",
+      reportType: "SELECTION_REVIEW",
+      projectName: input.projectName,
+      tagNumber: input.tagNumber,
+      serviceType: input.serviceType,
+      valveType: result.valveType,
+      status: issueReadiness.status,
+      generatedAt,
+      html: reviewReportHtml,
+    });
+    toast.success(`Stored report ${saved.id}`, {
+      description: "Offline report library keeps the latest 5 reports.",
+    });
+  };
+
+  const exportEpcPdf = () => {
+    guardIssueAction("Export EPC Datasheet", () => printHtml(epcDatasheetHtml));
+  };
+
+  const downloadEpcHtml = () => {
+    guardIssueAction("Download EPC Datasheet", () => {
+      downloadHtmlFile(
+        epcDatasheetHtml,
+        `ProfessionalEPCDatasheet_${safeExportFilename(input.tagNumber, "draft")}.html`,
+      );
     });
   };
 
@@ -436,6 +562,14 @@ function ReportPage() {
           <Button variant="outline" size="sm" onClick={onSave}>
             <Save className="h-4 w-4" /> Save
           </Button>
+          <Button variant="outline" size="sm" onClick={saveReviewReport}>
+            <Archive className="h-4 w-4" /> Store Report
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/reports">
+              <FileText className="h-4 w-4" /> Reports
+            </Link>
+          </Button>
           <Button
             size="sm"
             onClick={() => setPreviewOpen(true)}
@@ -446,6 +580,12 @@ function ReportPage() {
           <Button variant="outline" size="sm" onClick={downloadHtml}>
             <Download className="h-4 w-4" /> Download HTML
           </Button>
+          <Button variant="outline" size="sm" onClick={downloadReviewReport}>
+            <Download className="h-4 w-4" /> Review Report
+          </Button>
+          <Button variant="outline" size="sm" onClick={downloadEpcHtml}>
+            <Download className="h-4 w-4" /> EPC HTML
+          </Button>
           <Button variant="outline" size="sm" onClick={exportExcel}>
             <FileSpreadsheet className="h-4 w-4" /> Export Excel
           </Button>
@@ -455,6 +595,9 @@ function ReportPage() {
             onClick={exportPdf}
           >
             <Printer className="h-4 w-4" /> Export PDF
+          </Button>
+          <Button size="sm" variant="outline" onClick={exportEpcPdf}>
+            <Printer className="h-4 w-4" /> EPC PDF
           </Button>
         </div>
       </div>
@@ -508,6 +651,55 @@ function ReportPage() {
             }
           >
             <div className="mb-4 grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">
+                  Valve type recommendation / override
+                </p>
+                <Select
+                  value={input.valveTypeOverride || engineResult.valveType}
+                  onValueChange={(v) =>
+                    update({ valveTypeOverride: v === engineResult.valveType ? "" : v })
+                  }
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {valveTypeChoices.map((choice) => (
+                      <SelectItem key={choice.value} value={choice.value}>
+                        {choice.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="mt-2 grid gap-2 rounded-md border border-border bg-muted/30 p-3 text-xs sm:grid-cols-2">
+                  <div>
+                    <span className="text-muted-foreground">Engine recommended: </span>
+                    <span className="font-mono font-medium text-success">
+                      {engineResult.valveType}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Selected for report: </span>
+                    <span
+                      className={`font-mono font-medium ${
+                        result.valveType === engineResult.valveType
+                          ? "text-success"
+                          : "text-warning"
+                      }`}
+                    >
+                      {result.valveType}
+                    </span>
+                  </div>
+                  {input.valveTypeOverride &&
+                    input.valveTypeOverride !== engineResult.valveType && (
+                      <p className="sm:col-span-2 text-warning">
+                        Valve type override is active. Provide the override reason before issuing or
+                        exporting controlled reports.
+                      </p>
+                    )}
+                </div>
+              </div>
               <div>
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">
                   Pressure class (override)
@@ -642,7 +834,7 @@ function ReportPage() {
           {(engineResult.alternatives?.length > 0 || input.valveTypeOverride) && (
             <MSection
               icon={<AlertCircle className="h-4 w-4 text-warning" />}
-              title="Alternatives & rejected options"
+              title="Alternatives considered"
               badge={
                 input.valveTypeOverride ? (
                   <Badge variant="outline" className="border-warning/40 bg-warning/10 text-warning">
@@ -653,8 +845,8 @@ function ReportPage() {
               defaultOpen={false}
             >
               <p className="mb-3 text-xs text-muted-foreground">
-                Click an alternative to override the engine recommendation. The report and datasheet
-                will regenerate using your choice.
+                Valve type override is controlled in Selected valve specification so the decision,
+                recommendation, and selected value stay together.
               </p>
               <div className="space-y-2">
                 {engineResult.valveType &&
@@ -686,19 +878,20 @@ function ReportPage() {
                   return (
                     <div
                       key={i}
-                      className={`flex items-start justify-between gap-3 rounded-md border p-3 ${active ? "border-warning bg-warning/10" : "border-warning/30 bg-warning/5"}`}
+                      className={`rounded-md border p-3 ${active ? "border-warning bg-warning/10" : "border-warning/30 bg-warning/5"}`}
                     >
                       <div className="flex-1">
                         <p className="text-sm font-medium">{a.type}</p>
                         <p className="text-xs text-muted-foreground">{a.reason}</p>
                       </div>
-                      <Button
-                        size="sm"
-                        variant={active ? "default" : "outline"}
-                        onClick={() => update({ valveTypeOverride: active ? "" : a.type })}
-                      >
-                        {active ? "Selected" : "Use this"}
-                      </Button>
+                      {active && (
+                        <Badge
+                          className="mt-2 border-warning/40 bg-warning/10 text-warning"
+                          variant="outline"
+                        >
+                          Selected override
+                        </Badge>
+                      )}
                     </div>
                   );
                 })}
@@ -809,6 +1002,14 @@ function ReportPage() {
         <Button variant="outline" size="sm" onClick={onSave}>
           <Save className="h-4 w-4" /> Save
         </Button>
+        <Button variant="outline" size="sm" onClick={saveReviewReport}>
+          <Archive className="h-4 w-4" /> Store Report
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/reports">
+            <FileText className="h-4 w-4" /> Reports
+          </Link>
+        </Button>
         <Button
           size="sm"
           onClick={() => setPreviewOpen(true)}
@@ -819,6 +1020,12 @@ function ReportPage() {
         <Button variant="outline" size="sm" onClick={downloadHtml}>
           <Download className="h-4 w-4" /> Download HTML
         </Button>
+        <Button variant="outline" size="sm" onClick={downloadReviewReport}>
+          <Download className="h-4 w-4" /> Review Report
+        </Button>
+        <Button variant="outline" size="sm" onClick={downloadEpcHtml}>
+          <Download className="h-4 w-4" /> EPC HTML
+        </Button>
         <Button variant="outline" size="sm" onClick={exportExcel}>
           <FileSpreadsheet className="h-4 w-4" /> Export Excel
         </Button>
@@ -828,6 +1035,9 @@ function ReportPage() {
           onClick={exportPdf}
         >
           <Printer className="h-4 w-4" /> Export PDF
+        </Button>
+        <Button size="sm" variant="outline" onClick={exportEpcPdf}>
+          <Printer className="h-4 w-4" /> EPC PDF
         </Button>
       </div>
 

@@ -1,6 +1,8 @@
 // Local-only selection state persistence (no auth)
 const KEY = "valve_selection_state_v1";
 const SAVED_KEY = "valve_saved_selections_v1";
+const REPORTS_KEY = "valve_saved_reports_v1";
+const MAX_SAVED_REPORTS = 5;
 
 export function saveSelectionState(state) {
   if (typeof window === "undefined") return;
@@ -58,12 +60,45 @@ export function deleteSavedSelection(id) {
   } catch {}
 }
 
+export function listSavedReports() {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(REPORTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function getSavedReport(id) {
+  return listSavedReports().find((report) => report.id === id) ?? null;
+}
+
+export function saveReport(entry) {
+  const list = listSavedReports();
+  const id = `R-${Date.now().toString(36).toUpperCase()}`;
+  const report = { id, savedAt: new Date().toISOString(), ...entry };
+  const next = [report, ...list.filter((item) => item.id !== id)].slice(0, MAX_SAVED_REPORTS);
+  try {
+    localStorage.setItem(REPORTS_KEY, JSON.stringify(next));
+  } catch {}
+  return report;
+}
+
+export function deleteSavedReport(id) {
+  const list = listSavedReports().filter((report) => report.id !== id);
+  try {
+    localStorage.setItem(REPORTS_KEY, JSON.stringify(list));
+  } catch {}
+}
+
 export function exportSelectionSnapshot(state, savedSelections = listSavedSelections()) {
   return {
     schema: "valve-smart-assist.selection-snapshot.v1",
     exportedAt: new Date().toISOString(),
     currentSelection: state,
     savedSelections,
+    savedReports: listSavedReports(),
   };
 }
 
@@ -74,6 +109,12 @@ export function importSelectionSnapshot(snapshot) {
   if (snapshot.currentSelection) saveSelectionState(snapshot.currentSelection);
   if (Array.isArray(snapshot.savedSelections)) {
     localStorage.setItem(SAVED_KEY, JSON.stringify(snapshot.savedSelections.slice(0, 50)));
+  }
+  if (Array.isArray(snapshot.savedReports)) {
+    localStorage.setItem(
+      REPORTS_KEY,
+      JSON.stringify(snapshot.savedReports.slice(0, MAX_SAVED_REPORTS)),
+    );
   }
   return snapshot;
 }

@@ -18,6 +18,7 @@ const routes = [
   "/wizard/sizing",
   "/wizard/special",
   "/report",
+  "/reports",
   "/saved",
   "/references",
   "/manual",

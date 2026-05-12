@@ -108,6 +108,619 @@ export function buildDatasheetRows(data) {
   };
 }
 
+function displayValue(value) {
+  if (value === undefined || value === null || value === "") return "-";
+  if (Array.isArray(value)) return value.length ? value.join("; ") : "-";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+function reviewTable(rows) {
+  return `<table class="review-table"><tbody>${rows
+    .map(
+      ([label, value]) =>
+        `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(displayValue(value))}</td></tr>`,
+    )
+    .join("")}</tbody></table>`;
+}
+
+function reviewSection(title, body) {
+  return `<section class="section"><h2>${escapeHtml(title)}</h2>${body}</section>`;
+}
+
+function reviewList(items, empty = "None recorded.") {
+  const cleanItems = (items || []).filter((item) => displayValue(item) !== "-");
+  if (!cleanItems.length) return `<p class="muted">${escapeHtml(empty)}</p>`;
+  return `<ul>${cleanItems.map((item) => `<li>${escapeHtml(displayValue(item))}</li>`).join("")}</ul>`;
+}
+
+export function generateSelectionReviewHtml({
+  input = {},
+  result = {},
+  engineResult = {},
+  asmeRec = null,
+  asmeWarning = null,
+  b1634Check = null,
+  materialRatingGroup = null,
+  sizing = null,
+  overrideIssues = [],
+  issueStatus = "Draft",
+  generatedAt,
+} = {}) {
+  const dataset = materialRatingGroup?.dataset || result.materialRatingGroup?.dataset || {};
+  const governance = getGovernanceSnapshot({ datasetMetadata: dataset, status: issueStatus });
+  const issuedAt = generatedAt || governance.generatedAt;
+  const tag = input.tagNumber || input.tag_number || "Draft";
+  const project = input.projectName || input.project_name || "-";
+  const rationaleEntries = Object.entries(result.rationale || {});
+  const alternatives = engineResult.alternatives || result.alternatives || [];
+  const warnings = [
+    ...(result.warnings || []),
+    asmeWarning?.warning ? `ASME B16.5: ${asmeWarning.warning}` : "",
+    b1634Check?.warning ? `ASME B16.34: ${b1634Check.warning}` : "",
+  ].filter(Boolean);
+  const sizingResult = sizing?.s || {};
+  const sizingValve = sizing?.v || {};
+
+  const inputRows = [
+    ["Project", project],
+    ["Tag number", tag],
+    ["Service type", input.serviceType],
+    ["Fluid type", input.fluidType],
+    ["Valve function", input.valveFunction],
+    ["Installation location", input.installationLocation],
+    ["Pipe size", input.pipeSize],
+    ["Valve size", input.valveSize || input.pipeSize],
+    ["Pressure class", input.pressureClass],
+    ["Design pressure", `${displayValue(input.designPressure)} barg`],
+    ["Design temperature", `${displayValue(input.designTemp)} deg C`],
+    ["Operating pressure", input.operatingPressure ? `${input.operatingPressure} barg` : "-"],
+    ["Operating temperature", input.operatingTemp ? `${input.operatingTemp} deg C` : "-"],
+    ["Additional requirements", input.additionalRequirements],
+  ];
+
+  const selectedRows = [
+    ["Engine recommended valve type", engineResult.valveType || result.valveType],
+    ["Selected valve type", result.valveType],
+    [
+      "Valve type override status",
+      engineResult.valveType && result.valveType !== engineResult.valveType
+        ? "Override active - qualified review required"
+        : "Matches engine recommendation",
+    ],
+    ["Valve subtype", result.valveSubtype],
+    ["Body material", result.bodyMaterial],
+    ["Body material specification", result.bodyMaterialSpec],
+    ["Seat material", result.seatMaterial],
+    ["Disc / ball material", result.discBallMaterial],
+    ["Stem material", result.stemMaterial],
+    ["End connection", result.endConnection],
+    ["End connection standard", result.endConnectionStd],
+    ["Operator", result.operator],
+    ["Gasket", result.gasket],
+    ["Packing", result.packing],
+    ["Fire safe", result.fireSafe ? "Yes - API 607 screening basis" : "No / N/A"],
+    ["Valve standard", result.valveStandard],
+    ["Face-to-face standard", result.faceToFaceStd],
+    ["Flange standard", result.flangeStandard],
+    ["Testing standard", result.testingStandard],
+  ];
+
+  const ratingRows = [
+    ["Recommended pressure class", asmeRec?.recommendedClass || "-"],
+    ["Selected pressure class", input.pressureClass],
+    ["ASME B16.5 note", asmeRec?.note || asmeWarning?.warning || "-"],
+    ["ASME B16.5 maximum allowed", asmeRec?.maxAllowed ? `${asmeRec.maxAllowed} barg` : "-"],
+    ["ASME B16.34 body check", b1634Check?.warning || "-"],
+    ["Material group", materialRatingGroup?.label || "-"],
+    ["B16.5 source reference", materialRatingGroup?.b165Table || "-"],
+    ["B16.34 source reference", materialRatingGroup?.b1634Table || "-"],
+    ["Dataset use", getDatasetUseLabel(dataset)],
+    ["Dataset version", dataset.datasetVersion || "Built-in screening"],
+    [
+      "Dataset status",
+      dataset.verificationStatusLabel || dataset.verificationStatus || "Screening",
+    ],
+  ];
+
+  const overrideRows = overrideIssues.length
+    ? overrideIssues.map((issue) => [
+        issue.label,
+        `Recommended: ${issue.recommended}; selected: ${issue.selected}; reason: ${
+          issue.reason || "Not provided"
+        }`,
+      ])
+    : [["Overrides", "None recorded."]];
+
+  const sizingRows = sizing
+    ? [
+        ["Sizing status", sizingResult.ok === false ? "Incomplete / not valid" : "Calculated"],
+        [
+          "Required Cv",
+          sizingResult.requiredCv?.toFixed ? sizingResult.requiredCv.toFixed(2) : "-",
+        ],
+        [
+          "Required Kv",
+          sizingResult.requiredKv?.toFixed ? sizingResult.requiredKv.toFixed(2) : "-",
+        ],
+        ["Typical full-open Cv", sizingValve.typicalCv ?? "-"],
+        [
+          "Estimated opening",
+          sizingValve.openingPct?.toFixed ? `${sizingValve.openingPct.toFixed(0)} %` : "-",
+        ],
+        ["Verdict", sizingValve.verdict || "-"],
+        ["Sizing note", sizingValve.verdictNote || sizingResult.errors?.join(" ") || "-"],
+      ]
+    : [["Sizing", "Not applicable or not entered."]];
+
+  const rationaleBody = rationaleEntries.length
+    ? rationaleEntries
+        .map(([key, entry]) => {
+          const explanation = entry.expertExplanation || entry.basicExplanation || {};
+          return `<div class="rationale">
+            <h3>${escapeHtml(key)}</h3>
+            <p>${escapeHtml(entry.reason || "-")}</p>
+            ${
+              entry.rule
+                ? `<p class="rule"><strong>Rule:</strong> ${escapeHtml(entry.rule)}</p>`
+                : ""
+            }
+            ${
+              entry.refs?.length
+                ? `<p class="refs"><strong>References:</strong> ${escapeHtml(entry.refs.join("; "))}</p>`
+                : ""
+            }
+            ${
+              Object.keys(explanation).length
+                ? reviewTable(
+                    Object.entries(explanation).map(([label, value]) => [
+                      label.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()),
+                      value,
+                    ]),
+                  )
+                : ""
+            }
+          </div>`;
+        })
+        .join("")
+    : `<p class="muted">No rationale entries were generated.</p>`;
+
+  const alternativesBody = alternatives.length
+    ? alternatives
+        .map(
+          (item) =>
+            `<li><strong>${escapeHtml(item.type || "-")}:</strong> ${escapeHtml(item.reason || "-")}</li>`,
+        )
+        .join("")
+    : `<li>No alternative selections recorded.</li>`;
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Selection Review Report - ${escapeHtml(tag)}</title>
+<style>
+  @page { size: A4; margin: 14mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #111827; background: #fff; font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 1.45; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  .header { border-bottom: 2px solid #111827; padding-bottom: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; gap: 16px; }
+  h1 { margin: 0; font-size: 22px; letter-spacing: 0; }
+  h2 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #d1d5db; padding-bottom: 4px; }
+  h3 { margin: 0 0 4px; font-size: 12px; }
+  .classification { margin-top: 5px; font-weight: 700; color: #92400e; }
+  .meta { text-align: right; min-width: 250px; font-size: 10px; color: #374151; }
+  .notice { border: 1px solid #b45309; background: #fffbeb; padding: 10px; margin: 12px 0; color: #78350f; }
+  .section { break-inside: avoid; margin: 12px 0; }
+  .review-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .review-table th, .review-table td { border: 1px solid #d1d5db; padding: 5px 7px; vertical-align: top; }
+  .review-table th { width: 30%; background: #f3f4f6; text-align: left; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rationale { border: 1px solid #d1d5db; padding: 8px; margin-bottom: 8px; break-inside: avoid; }
+  .rule, .refs, .muted { color: #4b5563; }
+  ul { margin: 0; padding-left: 18px; }
+  li { margin: 3px 0; }
+  .footer { margin-top: 18px; border-top: 1px solid #d1d5db; padding-top: 8px; font-size: 9px; color: #4b5563; }
+  @media print { .page { padding: 0; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div>
+      <h1>Selection Review Report</h1>
+      <p class="classification">${escapeHtml(APP_GOVERNANCE.classification)}</p>
+    </div>
+    <div class="meta">
+      <div><strong>Project:</strong> ${escapeHtml(project)}</div>
+      <div><strong>Tag:</strong> ${escapeHtml(tag)}</div>
+      <div><strong>Status:</strong> ${escapeHtml(issueStatus)}</div>
+      <div><strong>Generated:</strong> ${escapeHtml(issuedAt)}</div>
+      <div><strong>App:</strong> ${escapeHtml(APP_GOVERNANCE.appVersion)} / ${escapeHtml(APP_GOVERNANCE.releaseId)}</div>
+    </div>
+  </header>
+
+  <div class="notice">${escapeHtml(USER_RESPONSIBILITY_NOTICE)} ${escapeHtml(EXPORT_GOVERNANCE_NOTICE)}</div>
+
+  ${reviewSection("1. Design Basis And User Inputs", reviewTable(inputRows))}
+  ${reviewSection("2. Selected Valve Specification", reviewTable(selectedRows))}
+  ${reviewSection("3. Standards And Rating Checks", reviewTable(ratingRows))}
+  ${reviewSection("4. Control / Sizing Basis", reviewTable(sizingRows))}
+  ${reviewSection("5. Overrides And Review Actions", reviewTable(overrideRows))}
+  ${reviewSection("6. Engineering Warnings", reviewList(warnings))}
+  ${reviewSection("7. Alternatives And Rejected Options", `<ul>${alternativesBody}</ul>`)}
+  ${reviewSection("8. Engineering Rationale", rationaleBody)}
+  ${reviewSection(
+    "9. Governance And Traceability",
+    reviewTable([
+      ["Owner", governance.owner],
+      ["Maintainer", governance.maintainer],
+      ["Support contact", governance.supportEmail],
+      ["Engineering authority", governance.engineeringAuthority],
+      ["Data steward", governance.dataSteward],
+      ["Independent checker", governance.independentChecker],
+      ["Readiness", governance.readiness],
+      ["Dataset owner", governance.datasetOwner],
+      ["Dataset reviewer", governance.datasetReviewer],
+      ["Dataset approval date", governance.datasetApprovalDate],
+      ["Standards copyright notice", STANDARDS_COPYRIGHT_NOTICE],
+    ]),
+  )}
+
+  <footer class="footer">
+    Generated by ${escapeHtml(APP_GOVERNANCE.appName)} ${escapeHtml(APP_GOVERNANCE.appVersion)} at ${escapeHtml(
+      issuedAt,
+    )}. This review report is a screening/internal-review record and does not authorize procurement, fabrication, construction, or operation without qualified engineering approval.
+  </footer>
+</div>
+</body>
+</html>`;
+}
+
+function epcValue(value, fallback = "—") {
+  const text = displayValue(value);
+  return text === "-" ? fallback : text;
+}
+
+function epcTable(rows) {
+  return `<table class="grid-table"><tbody>${rows
+    .map(
+      ([l1, v1, l2, v2]) => `<tr>
+        <th>${escapeHtml(l1)}</th><td>${escapeHtml(epcValue(v1))}</td>
+        <th>${escapeHtml(l2)}</th><td>${escapeHtml(epcValue(v2))}</td>
+      </tr>`,
+    )
+    .join("")}</tbody></table>`;
+}
+
+function epcFullRow(label, value) {
+  return `<tr><th>${escapeHtml(label)}</th><td colspan="3">${escapeHtml(epcValue(value))}</td></tr>`;
+}
+
+function conciseRationale(rationale = {}, keys = []) {
+  for (const key of keys) {
+    if (rationale[key]?.reason) return rationale[key].reason;
+  }
+  return "To be verified";
+}
+
+export function generateProfessionalEpcDatasheetHtml({
+  input = {},
+  result = {},
+  engineResult = {},
+  asmeRec = null,
+  asmeWarning = null,
+  b1634Check = null,
+  materialRatingGroup = null,
+  sizing = null,
+  overrideIssues = [],
+  issueStatus = "Issued for Review",
+  generatedAt,
+} = {}) {
+  const data = { ...input, ...result, materialRatingGroup, status: issueStatus, generatedAt };
+  const basis = deriveValveDatasheetBasis(data);
+  const dataset = materialRatingGroup?.dataset || result.materialRatingGroup?.dataset || {};
+  const governance = getGovernanceSnapshot({ datasetMetadata: dataset, status: issueStatus });
+  const issuedAt = generatedAt || governance.generatedAt;
+  const today = format(new Date(), "dd-MMM-yyyy");
+  const tag = input.tagNumber || input.tag_number || "DRAFT";
+  const project = input.projectName || input.project_name || "—";
+  const docNo = `MV-${safeExportFilename(tag, "DRAFT")}`;
+  const warnings = [
+    ...(result.warnings || []),
+    asmeWarning?.warning ? `ASME B16.5: ${asmeWarning.warning}` : "",
+    b1634Check?.warning ? `ASME B16.34: ${b1634Check.warning}` : "",
+  ].filter(Boolean);
+  const sizingResult = sizing?.s || {};
+  const sizingValve = sizing?.v || {};
+  const rationale = result.rationale || {};
+  const alternatives = result.alternatives || [];
+  const recommendedValveType = engineResult.valveType || result.valveType || "To be verified";
+  const valveOverrideStatus =
+    recommendedValveType && result.valveType && recommendedValveType !== result.valveType
+      ? "Override active - review required"
+      : "Matches recommendation";
+
+  const section = (title, body) => `<section><h2>${escapeHtml(title)}</h2>${body}</section>`;
+  const fullTable = (rows) =>
+    `<table class="grid-table"><tbody>${rows.map(([label, value]) => epcFullRow(label, value)).join("")}</tbody></table>`;
+
+  const standards = [
+    ["Valve design standard", result.valveStandard || "To be verified"],
+    ["Inspection / test", result.testingStandard || "API 598 / project requirement"],
+    ["End connection", result.endConnectionStd || "To be verified"],
+    ["Face-to-face", result.faceToFaceStd || "To be verified"],
+    ["Flange / rating", result.flangeStandard || "ASME B16.5 short reference"],
+    ["Body pressure boundary", materialRatingGroup?.b1634Table || "ASME B16.34 short reference"],
+  ];
+
+  const notesRows = warnings.length
+    ? warnings.map((warning, index) => [`Note ${index + 1}`, warning])
+    : [["Engineering notes", "No engine warnings recorded. Final EPC review required."]];
+
+  const alternativesRows = alternatives.length
+    ? alternatives.map((item) => [item.type || "Alternative", item.reason || "To be verified"])
+    : [["Alternatives", "No alternatives recorded."]];
+
+  const overrideRows = overrideIssues.length
+    ? overrideIssues.map((issue) => [
+        issue.label,
+        `Selected ${issue.selected}; engine recommended ${issue.recommended}; reason ${
+          issue.reason || "not provided"
+        }`,
+      ])
+    : [["Overrides", "None recorded."]];
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Professional EPC Manual Valve Datasheet - ${escapeHtml(tag)}</title>
+<style>
+  @page { size: A4 portrait; margin: 9mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: #111; font-family: Arial, Helvetica, sans-serif; font-size: 7.8pt; line-height: 1.25; }
+  .sheet { max-width: 190mm; margin: 0 auto; padding: 8mm; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th, td { border: 1px solid #111; padding: 3px 5px; vertical-align: top; }
+  th { background: #e5e7eb; text-align: left; font-weight: 700; }
+  .title { border: 2px solid #111; margin-bottom: 5px; }
+  .title td { border: 1px solid #111; }
+  .doc-title { font-size: 12pt; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: .03em; }
+  .muted { color: #444; }
+  h2 { margin: 5px 0 0; border: 1px solid #111; border-bottom: 0; background: #cbd5e1; padding: 3px 5px; font-size: 8pt; text-transform: uppercase; letter-spacing: .04em; }
+  .grid-table th { width: 23%; }
+  .grid-table td { width: 27%; }
+  .note { margin-top: 5px; border: 1px solid #111; padding: 4px 6px; font-size: 7pt; }
+  .footer { margin-top: 6px; font-size: 6.8pt; color: #333; }
+  .sign td { height: 24px; }
+  @media print {
+    body { font-size: 7.4pt; }
+    .sheet { padding: 0; max-width: none; }
+    section, tr { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <table class="title">
+    <tr>
+      <td rowspan="2" style="width:32%;"><strong>PROJECT</strong><br>${escapeHtml(project)}<br><span class="muted">Mechanical / Piping</span></td>
+      <td rowspan="2" class="doc-title">Professional EPC<br>Manual Valve Datasheet</td>
+      <td style="width:24%;"><strong>Doc No.</strong> ${escapeHtml(docNo)}</td>
+    </tr>
+    <tr><td><strong>Rev</strong> 0 &nbsp; <strong>Date</strong> ${escapeHtml(today)}</td></tr>
+    <tr>
+      <td><strong>Tag</strong> ${escapeHtml(epcValue(tag))}</td>
+      <td><strong>Status</strong> ${escapeHtml(issueStatus)}</td>
+      <td><strong>Generated</strong> ${escapeHtml(issuedAt)}</td>
+    </tr>
+  </table>
+
+  ${section(
+    "Document Control",
+    epcTable([
+      ["Client", "—", "Project No.", "—"],
+      ["Line No.", "—", "P&ID / Drawing", "—"],
+      ["Prepared By", "—", "Checked By", "—"],
+      ["Approved By", "—", "Approval Date", "—"],
+    ]),
+  )}
+
+  ${section(
+    "General Valve Information",
+    epcTable([
+      ["Service", input.serviceType, "Fluid", input.fluidType],
+      ["Recommended valve type", recommendedValveType, "Selected valve type", result.valveType],
+      ["Valve type status", valveOverrideStatus, "Configuration", result.valveSubtype],
+      ["Line size", input.pipeSize, "Valve size", input.valveSize || input.pipeSize],
+      ["Pressure class", input.pressureClass, "End connection", result.endConnection],
+      ["Installation", input.installationLocation, "Function", input.valveFunction],
+    ]),
+  )}
+
+  ${section(
+    "Design Conditions",
+    epcTable([
+      [
+        "Design pressure",
+        input.designPressure ? `${input.designPressure} barg` : "—",
+        "Design temperature",
+        input.designTemp ? `${input.designTemp} °C` : "—",
+      ],
+      [
+        "Operating pressure",
+        input.operatingPressure ? `${input.operatingPressure} barg` : "—",
+        "Operating temperature",
+        input.operatingTemp ? `${input.operatingTemp} °C` : "—",
+      ],
+      [
+        "Special service",
+        basis.specialService,
+        "Corrosion allowance",
+        basis.isSour ? "3.0 mm" : "1.5 mm",
+      ],
+      [
+        "Sour service",
+        basis.isSour ? "Applicable" : "N/A",
+        "Oxygen / cryogenic",
+        basis.isOxygen ? "Oxygen clean" : basis.isCryo ? "Cryogenic" : "N/A",
+      ],
+    ]),
+  )}
+
+  ${section("Applicable Standards", fullTable(standards))}
+
+  ${section(
+    "Design Requirements",
+    epcTable([
+      ["Bore", basis.bore, "Bidirectional sealing", basis.bidirectionalSealing],
+      ["Fire safe", basis.fireSafeRequirement, "Anti-static", basis.antiStaticDevice],
+      ["Stem retention", basis.blowoutProofStem, "Cavity relief", basis.cavityRelief],
+      ["Shell test", basis.shellTest, "Seat leakage", basis.seatLeakageBasis],
+      ["Fugitive emission", basis.fugitiveEmission, "Locking device", basis.lockingDevice],
+    ]),
+  )}
+
+  ${section(
+    "Metallic Materials",
+    epcTable([
+      ["Body", result.bodyMaterial, "Body spec.", result.bodyMaterialSpec],
+      [
+        "Material group",
+        materialRatingGroup?.label || "To be verified",
+        "Body rating basis",
+        materialRatingGroup?.b1634Table || "To be verified",
+      ],
+      ["Disc / ball", result.discBallMaterial, "Stem / shaft", result.stemMaterial],
+      [
+        "Bolting",
+        basis.isSour
+          ? "ASTM A193 B7M / A194 2HM (screening)"
+          : "ASTM A193 B7 / A194 2H (screening)",
+        "Bonnet / cover",
+        "To be verified",
+      ],
+    ]),
+  )}
+
+  ${section(
+    "Seal / Non-Metallic Materials",
+    epcTable([
+      ["Seat", result.seatMaterial, "Sealing system", basis.sealingSystem],
+      ["Gasket", result.gasket, "Packing", result.packing],
+      [
+        "Soft goods limits",
+        "To be verified",
+        "Fire backup",
+        result.fireSafe ? "Applicable" : "N/A",
+      ],
+    ]),
+  )}
+
+  ${section(
+    "Operation Requirements",
+    epcTable([
+      ["Operator", result.operator, "Operation", basis.operationRequirement],
+      ["Fail position", basis.failPosition, "Close direction", basis.operationDirection],
+      ["Position indicator", basis.positionIndicator, "Torque / thrust", basis.torqueSizing],
+    ]),
+  )}
+
+  ${section(
+    "Installation / Service Requirements",
+    epcTable([
+      [
+        "Orientation",
+        basis.orientationLimitation,
+        "Pigging",
+        basis.bore.includes("pigging") ? "Applicable" : "Not Required",
+      ],
+      [
+        "Maintenance access",
+        "To be verified",
+        "Vendor clarification",
+        "Required before procurement",
+      ],
+    ]),
+  )}
+
+  ${section(
+    "Cv / Sizing Summary",
+    epcTable([
+      [
+        "Sizing basis",
+        sizing ? "Preliminary IEC / ISA screening" : "N/A",
+        "Verdict",
+        sizingValve.verdict || "N/A",
+      ],
+      [
+        "Required Cv",
+        sizingResult.requiredCv?.toFixed ? sizingResult.requiredCv.toFixed(2) : "N/A",
+        "Required Kv",
+        sizingResult.requiredKv?.toFixed ? sizingResult.requiredKv.toFixed(2) : "N/A",
+      ],
+      [
+        "Typical Cv",
+        sizingValve.typicalCv ?? "N/A",
+        "Estimated opening",
+        sizingValve.openingPct?.toFixed ? `${sizingValve.openingPct.toFixed(0)} %` : "N/A",
+      ],
+    ]),
+  )}
+
+  ${section("Engineering Notes / Warnings", fullTable(notesRows))}
+
+  ${section(
+    "Selected Basis / Rationale",
+    fullTable([
+      ["Valve selection", conciseRationale(rationale, ["valveType", "service", "function"])],
+      ["Materials", conciseRationale(rationale, ["bodyMaterial", "materials", "trim"])],
+      ["End connection", conciseRationale(rationale, ["endConnection"])],
+      ["Operator", conciseRationale(rationale, ["operator"])],
+      [
+        "Rating check",
+        asmeRec?.note ||
+          asmeWarning?.warning ||
+          "To be verified against licensed/current standards",
+      ],
+    ]),
+  )}
+
+  ${section("Alternatives Considered", fullTable(alternativesRows))}
+  ${section("Overrides / Approval Actions", fullTable(overrideRows))}
+
+  ${section(
+    "Data Governance / Use Limitation",
+    fullTable([
+      ["Tool classification", APP_GOVERNANCE.classification],
+      ["Readiness", APP_GOVERNANCE.defaultReadiness],
+      ["Dataset use", getDatasetUseLabel(dataset)],
+      ["Dataset version", dataset.datasetVersion || "Built-in screening"],
+      ["Validation responsibility", USER_RESPONSIBILITY_NOTICE],
+      ["Standards notice", STANDARDS_COPYRIGHT_NOTICE],
+      ["Export limitation", EXPORT_GOVERNANCE_NOTICE],
+    ]),
+  )}
+
+  ${section(
+    "Revision And Approval",
+    `<table class="grid-table sign"><tbody>
+      <tr><th style="width:8%;">Rev</th><th>Description</th><th>Date</th><th>Prepared</th><th>Checked / Approved</th></tr>
+      <tr><td>0</td><td>${escapeHtml(issueStatus)}</td><td>${escapeHtml(today)}</td><td>—</td><td>—</td></tr>
+      <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
+    </tbody></table>`,
+  )}
+
+  <div class="note">${escapeHtml(
+    "Screening/internal-review export only. Vendor data, project specifications, licensed standards, material grades, pressure-temperature ratings, and approval signatures must be verified by the user organization before procurement or fabrication.",
+  )}</div>
+  <div class="footer">Generated by ${escapeHtml(APP_GOVERNANCE.appName)} ${escapeHtml(APP_GOVERNANCE.appVersion)} (${escapeHtml(APP_GOVERNANCE.releaseId)}).</div>
+</div>
+</body>
+</html>`;
+}
+
 export function deriveValveDatasheetBasis(data) {
   const v = (snake, camel) => {
     const val = data[snake] ?? data[camel];

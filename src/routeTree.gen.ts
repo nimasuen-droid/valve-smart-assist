@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SavedRouteImport } from './routes/saved'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as ReleaseRouteImport } from './routes/release'
 import { Route as ReferencesRouteImport } from './routes/references'
@@ -42,6 +43,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const SavedRoute = SavedRouteImport.update({
   id: '/saved',
   path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportRoute = ReportRouteImport.update({
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/references': typeof ReferencesRoute
   '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
+  '/reports': typeof ReportsRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/references': typeof ReferencesRoute
   '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
+  '/reports': typeof ReportsRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/references': typeof ReferencesRoute
   '/release': typeof ReleaseRoute
   '/report': typeof ReportRoute
+  '/reports': typeof ReportsRoute
   '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/references'
     | '/release'
     | '/report'
+    | '/reports'
     | '/saved'
     | '/settings'
     | '/terms'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/references'
     | '/release'
     | '/report'
+    | '/reports'
     | '/saved'
     | '/settings'
     | '/terms'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/references'
     | '/release'
     | '/report'
+    | '/reports'
     | '/saved'
     | '/settings'
     | '/terms'
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   ReferencesRoute: typeof ReferencesRoute
   ReleaseRoute: typeof ReleaseRoute
   ReportRoute: typeof ReportRoute
+  ReportsRoute: typeof ReportsRoute
   SavedRoute: typeof SavedRoute
   SettingsRoute: typeof SettingsRoute
   TermsRoute: typeof TermsRoute
@@ -298,6 +311,13 @@ declare module '@tanstack/react-router' {
       path: '/saved'
       fullPath: '/saved'
       preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/report': {
@@ -424,6 +444,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReferencesRoute: ReferencesRoute,
   ReleaseRoute: ReleaseRoute,
   ReportRoute: ReportRoute,
+  ReportsRoute: ReportsRoute,
   SavedRoute: SavedRoute,
   SettingsRoute: SettingsRoute,
   TermsRoute: TermsRoute,
@@ -439,3 +460,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
